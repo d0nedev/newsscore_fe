@@ -1,6 +1,6 @@
-# Products Admin (Nuxt frontend)
+# SkorKini (Nuxt frontend)
 
-Frontend-only Nuxt 4 app for an internal product admin. It is a client-rendered SPA, built to static files, and talks to a separate Go REST API over HTTP/JSON. Nuxt/Nitro is **not** a backend here: no server routes, no DB access.
+Frontend-only Nuxt 4 app for a live-scores site (static slice, dummy data). It is a client-rendered SPA, built to static files, and talks to a separate Go REST API over HTTP/JSON. Nuxt/Nitro is **not** a backend here: no server routes, no DB access.
 
 ```text
 Browser -> static host / CDN (this app) -> HTTPS -> Go REST API -> PostgreSQL
@@ -14,18 +14,17 @@ page -> composable (TanStack Vue Query) -> service -> apiFetch() -> $fetch -> Go
 
 ```text
 app/
-├── pages/          route composition only (login, products list/new/edit)
-├── layouts/        default (nav + logout), blank (login)
-├── components/     ProductForm, ErrorState
-├── composables/    useProducts/useProduct/useCreate|Update|DeleteProduct, useAuth
-├── services/       api-client.ts (apiFetch), product.service.ts, auth.service.ts
+├── pages/          route composition only (skor, kompetisi, tim, pemain, pertandingan)
+├── layouts/        default (header, sport nav, competitions, footer)
+├── components/     MatchList, MatchRow, MatchStats, StandingsTable, SquadTable, TabNav, TeamBadge, ErrorState
+├── data/           leagues.ts, matches.ts, teams.ts (dummy data for the static slice)
+├── services/       api-client.ts (apiFetch)
 ├── schemas/        Zod schemas (UX validation only; Go stays authoritative)
 ├── types/          API contract + domain types
 ├── utils/          ApiError mapping, user-facing messages, form helpers
-├── middleware/     auth.global.ts (route guard)
 └── plugins/        vue-query.ts (QueryClient, global 401 handling, logging)
 test/unit/          Vitest (utils, schemas)
-test/e2e/           Playwright against the production build with a mocked API
+test/e2e/           Playwright against the production build
 ```
 
 - **Server state** lives only in TanStack Vue Query. No Pinia: there is no global client state yet; add it when there is.
@@ -78,7 +77,7 @@ Static host requirements:
 - **SPA fallback**: unknown paths must serve `200.html` (e.g. nginx `try_files $uri $uri/ /200.html;`, Netlify `/* /200.html 200`).
 - **Cache**: `/_nuxt/*` is content-hashed, so `Cache-Control: public, max-age=31536000, immutable`; HTML files `no-cache`.
 - **HTTPS only**, plus security headers at the host (`Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `frame-ancestors 'none'`). A CSP must allow Nuxt's inline config script (hash or nonce) and `connect-src` for the API origin.
-- Client source maps are not emitted in production builds. `robots.txt` and a `noindex` meta keep the admin out of search engines.
+- Client source maps are not emitted in production builds.
 
 ## Authentication
 

@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true }, // dev server only, not shipped in builds
   modules: ["@nuxt/eslint"],
 
-  // Internal admin app: client-side rendered, deployed as static files.
+  // Client-side rendered, deployed as static files.
   ssr: false,
   nitro: { preset: "static" },
 
@@ -15,9 +15,8 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: "Products Admin",
+      title: "SkorKini",
       htmlAttrs: { lang: "en" },
-      meta: [{ name: "robots", content: "noindex, nofollow" }],
     },
   },
 

@@ -150,11 +150,11 @@ app/
 ├── plugins/
 ├── services/
 │   ├── api-client.ts
-│   ├── product.service.ts
+│   ├── match.service.ts
 │   └── ...
 ├── types/
 │   ├── api.ts
-│   ├── product.ts
+│   ├── match.ts
 │   └── ...
 ├── schemas/
 │   └── ...
@@ -183,10 +183,10 @@ Reusable frontend logic and state.
 Examples:
 
 ```text
-useProducts()
-useProduct()
-useCreateProduct()
-useUpdateProduct()
+useMatches()
+useMatch()
+useCreateMatch()
+useUpdateMatch()
 ```
 
 ### services/
@@ -196,9 +196,9 @@ Domain-specific API communication.
 Example:
 
 ```text
-product.service.ts
-order.service.ts
-auth.service.ts
+match.service.ts
+league.service.ts
+team.service.ts
 ```
 
 ### api-client.ts
@@ -240,7 +240,7 @@ The Go API uses this response format.
 {
   "data": {
     "id": "123",
-    "name": "Keyboard"
+    "name": "Liga Primer"
   }
 }
 ```
@@ -263,13 +263,13 @@ The frontend should NOT depend on the internal structure of the cursor.
 Use:
 
 ```text
-GET /api/products?limit=20
+GET /api/matches?limit=20
 ```
 
 Then:
 
 ```text
-GET /api/products?limit=20&cursor=...
+GET /api/matches?limit=20&cursor=...
 ```
 
 ## Error
@@ -277,8 +277,8 @@ GET /api/products?limit=20&cursor=...
 ```json
 {
   "error": {
-    "code": "PRODUCT_NOT_FOUND",
-    "message": "Product not found",
+    "code": "MATCH_NOT_FOUND",
+    "message": "Match not found",
     "details": null
   }
 }
@@ -293,7 +293,7 @@ Validation:
     "message": "Request validation failed",
     "details": {
       "name": "Name is required",
-      "price": "Price must be greater than or equal to 0"
+      "kickoffAt": "Kickoff must be a valid date"
     }
   }
 }
@@ -369,11 +369,11 @@ Use TanStack Vue Query for server state.
 Server state includes:
 
 ```text
-products
-orders
-users
-profiles
-notifications
+matches
+leagues
+teams
+players
+standings
 ```
 
 Do not unnecessarily store server responses in Pinia.
@@ -418,7 +418,7 @@ Expected flow:
 ```text
 Initial request
 
-GET /api/products?limit=20
+GET /api/matches?limit=20
 
         ↓
 
@@ -426,7 +426,7 @@ data + nextCursor
 
         ↓
 
-GET /api/products?limit=20&cursor=<nextCursor>
+GET /api/matches?limit=20&cursor=<nextCursor>
 ```
 
 Use TanStack Query's appropriate pagination/infinite-query mechanism.
@@ -453,12 +453,12 @@ Use Zod for frontend validation.
 Example:
 
 ```ts
-const productSchema = z.object({
-  name: z.string().trim().min(1).max(100),
-  description: z.string().trim().max(500),
-  price: z.number().nonnegative(),
-  stock: z.number().int().nonnegative(),
-  active: z.boolean(),
+const matchSchema = z.object({
+  homeTeamId: z.string().min(1),
+  awayTeamId: z.string().min(1),
+  kickoffAt: z.iso.datetime(),
+  venue: z.string().trim().max(120),
+  live: z.boolean(),
 });
 ```
 
@@ -528,10 +528,10 @@ Loading:
 Skeleton
 
 Empty:
-"No products found"
+"No matches found"
 
 Error:
-"Unable to load products"
+"Unable to load matches"
 [Retry]
 ```
 
@@ -716,15 +716,12 @@ Use Playwright.
 At minimum test critical flows:
 
 ```text
-Login
-Product list
-Product creation
-Product editing
-Product deletion
+Match list per date
+Match detail tabs
+League standings
+Team squad
 Pagination
 API error handling
-Authorization
-Logout
 ```
 
 Avoid writing meaningless tests just to increase coverage percentage.

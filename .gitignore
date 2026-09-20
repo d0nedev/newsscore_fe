@@ -29,3 +29,6 @@ playwright-report
 
 graphify-out/
 .claude
+
+# Reference mirror (local only)
+source

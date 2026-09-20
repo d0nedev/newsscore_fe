@@ -11,7 +11,7 @@ export function zodFieldErrors(error: z.ZodError): Record<string, string> {
 }
 
 // Only allow same-app paths, to avoid open redirects via ?redirect=.
-export function safeRedirect(value: unknown, fallback = "/products"): string {
+export function safeRedirect(value: unknown, fallback = "/"): string {
   return typeof value === "string" &&
     value.startsWith("/") &&
     !value.startsWith("//") &&

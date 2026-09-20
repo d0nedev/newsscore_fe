@@ -9,14 +9,14 @@ const notFound = computed(() => props.error.statusCode === 404);
   <div class="grid min-h-screen place-items-center p-4 text-center">
     <div class="space-y-3">
       <h1 class="text-2xl font-semibold">
-        {{ notFound ? "Page not found" : "Something went wrong" }}
+        {{ notFound ? "Halaman tidak ditemukan" : "Terjadi kesalahan" }}
       </h1>
       <button
         type="button"
         class="underline"
-        @click="clearError({ redirect: '/products' })"
+        @click="clearError({ redirect: '/' })"
       >
-        Back to products
+        Kembali ke skor
       </button>
     </div>
   </div>

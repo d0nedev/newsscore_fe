@@ -58,8 +58,8 @@ describe("toApiError", () => {
         404,
         {
           error: {
-            code: "PRODUCT_NOT_FOUND",
-            message: "Product not found",
+            code: "MATCH_NOT_FOUND",
+            message: "Match not found",
             details: null,
           },
         },
@@ -81,10 +81,10 @@ describe("errorMessage", () => {
     const err = new ApiError({
       kind: "not_found",
       status: 404,
-      code: "PRODUCT_NOT_FOUND",
-      message: "Product not found",
+      code: "MATCH_NOT_FOUND",
+      message: "Match not found",
     });
-    expect(errorMessage(err)).toBe("Product not found");
+    expect(errorMessage(err)).toBe("Match not found");
   });
 
   it("hides raw server messages", () => {
