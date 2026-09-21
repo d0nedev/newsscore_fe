@@ -5,11 +5,8 @@ defineProps<{ leagues: League[]; top?: number }>();
 </script>
 
 <template>
-  <section class="bg-background rounded-lg border shadow-sm">
-    <header class="flex items-center justify-between border-b px-4 py-3">
-      <h2 class="text-sm font-bold">Ringkasan Klasemen</h2>
-    </header>
-    <div class="grid gap-4 p-4 sm:grid-cols-2">
+  <SectionCard title="Ringkasan Klasemen" :flush="false">
+    <div class="grid gap-4 border-t pt-4 sm:grid-cols-2">
       <div v-for="league in leagues" :key="league.id">
         <NuxtLink
           :to="`/sepak-bola/${league.id}`"
@@ -51,5 +48,5 @@ defineProps<{ leagues: League[]; top?: number }>();
         </table>
       </div>
     </div>
-  </section>
+  </SectionCard>
 </template>

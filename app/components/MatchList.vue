@@ -2,16 +2,22 @@
 import { ChevronDown, ChevronUp, Pin, Star } from "@lucide/vue";
 import type { Match } from "~/types/match";
 
-defineProps<{
+const props = defineProps<{
   title?: string;
   subtitle?: string;
   leagueId?: string;
+  /** Link label on the right of the header bar: standings, or a cup bracket. */
+  linkLabel?: string;
+  perspectiveTeamId?: string;
   matches: Match[];
 }>();
 
 const open = ref(true);
 const starred = ref(false);
-const pinned = ref(false);
+
+// A section header only offers a pin when it stands for a real competition.
+const { isPinned, toggle } = usePinnedLeagues();
+const pinned = computed(() => isPinned(props.leagueId));
 </script>
 
 <template>
@@ -37,13 +43,16 @@ const pinned = ref(false);
         {{ title }}
       </h2>
       <Button
+        v-if="leagueId"
         variant="ghost"
         size="icon"
         class="size-6 shrink-0"
         :class="pinned ? 'text-sky-600' : 'text-muted-foreground'"
         :aria-pressed="pinned"
-        :aria-label="`Sematkan ${title}`"
-        @click="pinned = !pinned"
+        :aria-label="
+          pinned ? `Lepas sematan ${title}` : `Sematkan ${title}`
+        "
+        @click="toggle(leagueId)"
       >
         <Pin :fill="pinned ? 'currentColor' : 'none'" />
       </Button>
@@ -51,7 +60,7 @@ const pinned = ref(false);
         v-if="leagueId"
         :to="`/sepak-bola/${leagueId}`"
         class="hover:text-primary ml-auto text-xs underline"
-        >Klasemen</NuxtLink
+        >{{ linkLabel ?? "Klasemen" }}</NuxtLink
       >
       <Button
         variant="ghost"
@@ -71,7 +80,7 @@ const pinned = ref(false);
     </p>
     <ul v-else-if="open" class="divide-y border-b">
       <li v-for="match in matches" :key="match.id">
-        <MatchRow :match="match" />
+        <MatchRow :match="match" :perspective-team-id="perspectiveTeamId" />
       </li>
     </ul>
   </section>

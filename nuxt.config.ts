@@ -21,7 +21,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: "SkorKini",
+      title: "NEWSSCORE",
       htmlAttrs: { lang: "en" },
     },
   },

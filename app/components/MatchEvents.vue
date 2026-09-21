@@ -41,13 +41,12 @@ const cardColor = (type: MatchEvent["type"]) =>
 <template>
   <div>
     <template v-for="half in halves" :key="half.label">
-      <h3
-        v-if="half.rows.length"
-        class="bg-muted text-muted-foreground flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase"
-      >
+      <SubHeading v-if="half.rows.length">
         {{ half.label }}
-        <span class="tabular-nums">{{ half.score }}</span>
-      </h3>
+        <template #trailing>
+          <span class="tabular-nums">{{ half.score }}</span>
+        </template>
+      </SubHeading>
       <ul v-if="half.rows.length" class="py-1 text-sm">
         <li
           v-for="{ event, score } in half.rows"

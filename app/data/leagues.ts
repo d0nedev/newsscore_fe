@@ -1,14 +1,17 @@
 import type { League } from "~/types/match";
+import { slugify } from "~/utils/slug";
 
 const form = (s: string) => [...s] as ("W" | "D" | "L")[];
 
 // Dummy standings for the static slice.
-export const leagues: League[] = [
+export const competitions: League[] = [
   {
     id: "liga-primer",
     country: "Inggris",
     name: "Liga Primer",
     season: "2026/2027",
+    start: "22.08",
+    end: "30.05",
     archive: [
       { season: "2025/2026", winner: "Arsenal", runnerUp: "Liverpool" },
       { season: "2024/2025", winner: "Liverpool", runnerUp: "Chelsea" },
@@ -100,6 +103,8 @@ export const leagues: League[] = [
     country: "Spanyol",
     name: "LaLiga",
     season: "2026/2027",
+    start: "22.08",
+    end: "30.05",
     archive: [
       { season: "2025/2026", winner: "Real Madrid", runnerUp: "Girona" },
       { season: "2024/2025", winner: "Girona", runnerUp: "Real Madrid" },
@@ -165,6 +170,8 @@ export const leagues: League[] = [
     country: "Italia",
     name: "Serie A",
     season: "2026/2027",
+    start: "22.08",
+    end: "30.05",
     archive: [
       { season: "2025/2026", winner: "Inter", runnerUp: "Napoli" },
       { season: "2024/2025", winner: "Napoli", runnerUp: "Inter" },
@@ -199,7 +206,47 @@ export const leagues: League[] = [
       },
     ],
   },
+  {
+    id: "piala-efl",
+    country: "Inggris",
+    name: "Piala EFL",
+    season: "2026/2027",
+    type: "cup",
+    start: "12.08",
+    end: "28.02",
+    standings: [],
+    archive: [
+      { season: "2025/2026", winner: "Newcastle", runnerUp: "Liverpool" },
+      { season: "2024/2025", winner: "Liverpool", runnerUp: "Tottenham" },
+      { season: "2023/2024", winner: "Chelsea", runnerUp: "Everton" },
+    ],
+  },
+  {
+    id: "persahabatan-klub",
+    country: "Dunia",
+    name: "Pertandingan Persahabatan antar Klub",
+    season: "2026",
+    type: "friendly",
+    standings: [],
+    archive: [],
+  },
 ];
 
+// Cups keep an empty table, so anything standings-driven filters them out.
+export const leagues = competitions.filter(
+  (competition) => competition.standings.length > 0,
+);
+
 export const findLeague = (id: string) =>
-  leagues.find((league) => league.id === id);
+  competitions.find((competition) => competition.id === id);
+
+/** Countries that actually host a competition, in first-seen order. */
+export const countries = [
+  ...new Set(competitions.map((competition) => competition.country)),
+];
+
+export const findCountry = (slug: string) =>
+  countries.find((country) => slugify(country) === slug);
+
+export const competitionsByCountry = (country: string) =>
+  competitions.filter((competition) => competition.country === country);

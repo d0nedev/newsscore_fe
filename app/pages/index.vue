@@ -7,13 +7,14 @@ import type { MatchStatus } from "~/types/match";
 
 useHead({ title: "Skor Langsung" });
 
-const filters: { label: string; value: MatchStatus | "all" }[] = [
-  { label: "SEMUA", value: "all" },
-  { label: "LIVE", value: "live" },
-  { label: "SELESAI", value: "finished" },
-  { label: "JADWAL", value: "scheduled" },
-];
-const filter = ref<MatchStatus | "all">("all");
+const filters: Record<string, MatchStatus | "all"> = {
+  SEMUA: "all",
+  LIVE: "live",
+  SELESAI: "finished",
+  JADWAL: "scheduled",
+};
+const filterLabel = ref("SEMUA");
+const filter = computed(() => filters[filterLabel.value]!);
 const date = ref(today);
 
 const onDate = computed(() =>
@@ -24,6 +25,7 @@ const shownMatches = computed(() =>
     (match) => filter.value === "all" || match.status === filter.value,
   ),
 );
+const matchCount = computed(() => `${shownMatches.value.length} pertandingan`);
 // The hero picks the running match, falling back to the first of the day.
 const featured = computed(
   () =>
@@ -40,51 +42,41 @@ const leagueName = (id: string) => findLeague(id)?.name ?? "";
       :league="leagueName(featured.leagueId)"
     />
 
-    <section class="bg-background rounded-lg border shadow-sm">
-      <div class="flex flex-wrap items-center gap-2 border-b px-3 py-2">
-        <Button
-          v-for="item in filters"
-          :key="item.value"
-          size="sm"
-          class="rounded-full text-xs font-bold"
-          :variant="filter === item.value ? 'default' : 'secondary'"
-          :aria-pressed="filter === item.value"
-          @click="filter = item.value"
-        >
-          {{ item.label }}
-        </Button>
+    <SectionCard
+      title="Pertandingan Hari Ini"
+      :empty="
+        shownMatches.length ? undefined : 'Tidak ada pertandingan pada filter ini.'
+      "
+    >
+      <template #action>
+        <span class="text-muted-foreground text-xs">{{ matchCount }}</span>
+      </template>
+
+      <div class="flex flex-wrap items-center gap-2 border-t px-4 py-3">
+        <PillTabs
+          v-model="filterLabel"
+          :items="Object.keys(filters)"
+          label="Saring pertandingan"
+        />
         <DateNav v-model="date" class="ml-auto shrink-0">
           <Calendar class="text-muted-foreground size-4" />
         </DateNav>
       </div>
 
-      <header class="flex items-center justify-between px-4 pt-3 text-sm">
-        <h2 class="font-bold">Pertandingan Hari Ini</h2>
-        <span class="text-muted-foreground"
-          >{{ shownMatches.length }} pertandingan</span
-        >
-      </header>
-
-      <p
-        v-if="shownMatches.length === 0"
-        class="text-muted-foreground p-6 text-center text-sm"
-      >
-        Tidak ada pertandingan pada filter ini.
-      </p>
-      <ul v-else aria-label="Pertandingan hari ini" class="divide-y p-1">
+      <ul aria-label="Pertandingan hari ini" class="divide-y border-t">
         <li v-for="match in shownMatches" :key="match.id">
           <MatchCardRow :match="match" :league="leagueName(match.leagueId)" />
         </li>
       </ul>
 
-      <footer class="border-t p-2 text-center">
-        <Button as-child variant="ghost" size="sm" class="gap-2">
+      <div class="border-t p-2 text-center">
+        <Button as-child variant="ghost" size="sm" class="gap-2 text-xs font-semibold">
           <NuxtLink :to="`/sepak-bola/${leagues[0]!.id}`">
             <CalendarDays /> Lihat Jadwal Lengkap
           </NuxtLink>
         </Button>
-      </footer>
-    </section>
+      </div>
+    </SectionCard>
 
     <StandingsOverview :leagues="leagues" />
 

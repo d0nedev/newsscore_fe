@@ -1,4 +1,4 @@
-# SkorKini (Nuxt frontend)
+# NEWSSCORE (Nuxt frontend)
 
 Frontend-only Nuxt 4 app for a live-scores site (static slice, dummy data). It is a client-rendered SPA, built to static files, and talks to a separate Go REST API over HTTP/JSON. Nuxt/Nitro is **not** a backend here: no server routes, no DB access.
 

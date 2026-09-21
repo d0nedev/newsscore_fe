@@ -22,54 +22,47 @@ const label = {
 </script>
 
 <template>
-  <div class="space-y-3">
-    <Card
-      v-for="group in groups"
-      :key="group.position"
-      class="gap-0 overflow-hidden py-0"
-    >
-      <CardHeader class="border-b px-3 py-2 [.border-b]:pb-2">
-        <CardTitle as="h3" class="text-sm">{{
-          label[group.position]
-        }}</CardTitle>
-      </CardHeader>
-      <CardContent class="px-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nama</TableHead>
-              <TableHead class="text-center">Usia</TableHead>
-              <TableHead class="text-center">Main</TableHead>
-              <TableHead class="text-center">Gol</TableHead>
-              <TableHead class="text-center">Assist</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-for="player in group.players" :key="player.id">
-              <TableCell>
-                <NuxtLink :to="`/pemain/${player.id}`" class="hover:underline">
-                  <span class="text-muted-foreground mr-2 tabular-nums">{{
-                    player.number
-                  }}</span>
-                  {{ player.name }}
-                </NuxtLink>
-              </TableCell>
-              <TableCell class="text-center tabular-nums">{{
-                player.age
-              }}</TableCell>
-              <TableCell class="text-center tabular-nums">{{
-                player.matches
-              }}</TableCell>
-              <TableCell class="text-center tabular-nums">{{
-                player.goals
-              }}</TableCell>
-              <TableCell class="text-center tabular-nums">{{
-                player.assists
-              }}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+  <div>
+    <section v-for="group in groups" :key="group.position">
+      <SubHeading>{{ label[group.position] }}</SubHeading>
+      <Table class="text-sm">
+        <TableHeader>
+          <TableRow class="text-muted-foreground text-xs uppercase">
+            <TableHead class="pl-4">Nama</TableHead>
+            <TableHead class="w-14 text-center">Usia</TableHead>
+            <TableHead class="w-14 text-center">Main</TableHead>
+            <TableHead class="w-14 text-center">Gol</TableHead>
+            <TableHead class="w-16 pr-4 text-center">Assist</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow v-for="player in group.players" :key="player.id">
+            <TableCell class="pl-4">
+              <NuxtLink
+                :to="`/pemain/${player.id}`"
+                class="hover:text-primary flex items-center gap-2"
+              >
+                <span class="text-muted-foreground w-5 tabular-nums">{{
+                  player.number
+                }}</span>
+                <span class="truncate font-semibold">{{ player.name }}</span>
+              </NuxtLink>
+            </TableCell>
+            <TableCell class="text-center tabular-nums">{{
+              player.age
+            }}</TableCell>
+            <TableCell class="text-center tabular-nums">{{
+              player.matches
+            }}</TableCell>
+            <TableCell class="text-center font-semibold tabular-nums">{{
+              player.goals
+            }}</TableCell>
+            <TableCell class="pr-4 text-center tabular-nums">{{
+              player.assists
+            }}</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </section>
   </div>
 </template>

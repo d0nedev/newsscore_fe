@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import { Menu, Plus, Pin, Search, Star, User } from "@lucide/vue";
 import { liveCount, sports } from "~/data/matches";
-import { leagues } from "~/data/leagues";
+import { countries, leagues } from "~/data/leagues";
+import { slugify } from "~/utils/slug";
 
-// Static stand-in for the "pinned" list a signed-in user would have.
-const pinned = leagues.slice(0, 2);
+const { pinnedLeagues } = usePinnedLeagues();
 const followedTeams = ["Jerman", "Chelsea"];
+const help = [
+  "Ketentuan Penggunaan",
+  "Kebijakan Privasi",
+  "Cara Membaca Statistik",
+  "Kontak",
+];
+const year = new Date().getFullYear();
 </script>
 
 <template>
@@ -13,7 +20,7 @@ const followedTeams = ["Jerman", "Chelsea"];
     <header class="bg-header text-header-foreground">
       <div class="mx-auto flex max-w-[1240px] items-center gap-2 px-4 py-3">
         <NuxtLink to="/" class="text-2xl font-extrabold tracking-tight">
-          SKOR<span class="bg-primary ml-1 rounded px-1.5">KINI</span>
+          NEWS<span class="bg-primary ml-1 rounded px-1.5">SCORE</span>
         </NuxtLink>
         <Button
           variant="ghost"
@@ -76,8 +83,14 @@ const followedTeams = ["Jerman", "Chelsea"];
           >
             <Pin class="size-4" /> Liga Yang Disematkan
           </h2>
+          <p
+            v-if="!pinnedLeagues.length"
+            class="text-muted-foreground py-2 text-xs"
+          >
+            Belum ada liga yang disematkan.
+          </p>
           <ul class="py-1 text-sm">
-            <li v-for="league in pinned" :key="league.id">
+            <li v-for="league in pinnedLeagues" :key="league.id">
               <NuxtLink
                 :to="`/sepak-bola/${league.id}`"
                 class="hover:text-primary flex items-center gap-2 py-1.5"
@@ -104,6 +117,26 @@ const followedTeams = ["Jerman", "Chelsea"];
               >
                 <CountryChip :country="league.country" />
                 {{ league.name }}
+              </NuxtLink>
+            </li>
+          </ul>
+        </nav>
+
+        <nav aria-label="Negara">
+          <h2
+            class="flex items-center gap-2 border-b pb-2 text-xs font-bold uppercase"
+          >
+            Negara
+          </h2>
+          <ul class="py-1 text-sm">
+            <li v-for="country in countries" :key="country">
+              <NuxtLink
+                :to="`/negara/${slugify(country)}`"
+                class="hover:text-primary flex items-center gap-2 py-1.5"
+                active-class="text-primary font-semibold"
+              >
+                <CountryChip :country="country" />
+                {{ country }}
               </NuxtLink>
             </li>
           </ul>
@@ -151,12 +184,71 @@ const followedTeams = ["Jerman", "Chelsea"];
       </aside>
     </div>
 
-    <footer class="bg-background border-t">
+    <footer class="bg-header text-header-foreground mt-4">
       <div
-        class="text-muted-foreground mx-auto max-w-[1240px] px-4 py-6 text-xs sm:flex sm:justify-between"
+        class="mx-auto grid max-w-[1240px] gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4"
       >
-        <p>SkorKini — slicing statis dengan data dummy.</p>
-        <p>Skor hanya untuk demonstrasi.</p>
+        <div>
+          <p class="text-xl font-extrabold tracking-tight">
+            NEWS<span class="bg-primary ml-1 rounded px-1.5">SCORE</span>
+          </p>
+          <p class="text-header-foreground/60 mt-3 text-xs leading-relaxed">
+            Skor langsung, klasemen, dan statistik pertandingan. Seluruh angka
+            di situs ini masih data dummy untuk keperluan pengembangan.
+          </p>
+        </div>
+
+        <nav aria-label="Jelajahi">
+          <h2 class="text-header-foreground/50 text-xs font-bold uppercase">
+            Jelajahi
+          </h2>
+          <ul class="mt-3 space-y-2 text-sm">
+            <li>
+              <NuxtLink to="/" class="hover:text-primary">Skor Langsung</NuxtLink>
+            </li>
+            <li v-for="league in leagues" :key="league.id">
+              <NuxtLink
+                :to="`/sepak-bola/${league.id}`"
+                class="hover:text-primary"
+                >{{ league.name }}</NuxtLink
+              >
+            </li>
+          </ul>
+        </nav>
+
+        <nav aria-label="Bantuan">
+          <h2 class="text-header-foreground/50 text-xs font-bold uppercase">
+            Bantuan
+          </h2>
+          <ul class="mt-3 space-y-2 text-sm">
+            <li v-for="item in help" :key="item">
+              <span class="text-header-foreground/70">{{ item }}</span>
+            </li>
+          </ul>
+        </nav>
+
+        <section>
+          <h2 class="text-header-foreground/50 text-xs font-bold uppercase">
+            Tentang Data
+          </h2>
+          <p class="text-header-foreground/60 mt-3 text-xs leading-relaxed">
+            Jadwal, hasil, dan klasemen diperbarui otomatis saat sumber data
+            tersambung. Sampai saat itu, semua isinya contoh statis.
+          </p>
+          <p class="text-header-foreground/60 mt-3 text-xs">
+            Ada koreksi data?
+            <span class="text-primary font-semibold">Hubungi kami</span>
+          </p>
+        </section>
+      </div>
+
+      <div class="border-header-foreground/10 border-t">
+        <div
+          class="text-header-foreground/50 mx-auto flex max-w-[1240px] flex-col gap-1 px-4 py-4 text-xs sm:flex-row sm:justify-between"
+        >
+          <p>&copy; {{ year }} NEWSSCORE</p>
+          <p>Skor hanya untuk demonstrasi.</p>
+        </div>
       </div>
     </footer>
   </div>

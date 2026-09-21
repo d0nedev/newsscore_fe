@@ -94,7 +94,7 @@ test("league archive lists past seasons", async ({ page }) => {
 test("league page shows standings", async ({ page }) => {
   await page.goto("/sepak-bola/liga-primer");
   await expect(
-    page.getByRole("heading", { name: "Liga Primer" }),
+    page.getByRole("heading", { name: "Liga Primer", exact: true }),
   ).toBeVisible();
 
   await page.getByRole("tab", { name: "Klasemen" }).click();
@@ -108,10 +108,14 @@ test("team squad links through to a player profile", async ({ page }) => {
   await page.getByRole("tab", { name: "Skuad" }).click();
   await page.getByRole("link", { name: /C. Palmer/ }).click();
   await expect(page).toHaveURL("/pemain/che-6");
-  await expect(page.getByText("Transfer")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Transfer", exact: true }),
+  ).toBeVisible();
 
   await page.getByRole("tab", { name: "Cedera" }).click();
-  await expect(page.getByText("Sejarah Cedera")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Sejarah cedera", exact: true }),
+  ).toBeVisible();
   await expect(page.getByText("Cedera hamstring")).toBeVisible();
 });
 

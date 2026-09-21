@@ -6,14 +6,11 @@ defineProps<{ items: NewsItem[] }>();
 </script>
 
 <template>
-  <section class="bg-background rounded-lg border shadow-sm">
-    <header class="flex items-center justify-between border-b px-4 py-3">
-      <h2 class="flex items-center gap-2 text-sm font-bold">
-        <Newspaper class="size-4" /> Berita & Pembaruan
-      </h2>
-      <span class="text-muted-foreground text-xs">Konten dummy</span>
-    </header>
-    <ul class="divide-y">
+  <SectionCard title="Berita & Pembaruan">
+    <template #action>
+      <Newspaper class="text-muted-foreground size-4" />
+    </template>
+    <ul class="divide-y border-t">
       <li
         v-for="item in items"
         :key="item.id"
@@ -39,5 +36,5 @@ defineProps<{ items: NewsItem[] }>();
         </span>
       </li>
     </ul>
-  </section>
+  </SectionCard>
 </template>

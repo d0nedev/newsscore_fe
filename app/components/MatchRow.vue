@@ -2,7 +2,11 @@
 import { Star } from "@lucide/vue";
 import type { Match } from "~/types/match";
 
-const props = defineProps<{ match: Match }>();
+const props = defineProps<{
+  match: Match;
+  /** When set, the row gains a M/S/K badge for this team's result. */
+  perspectiveTeamId?: string;
+}>();
 
 const starred = ref(false);
 
@@ -16,6 +20,26 @@ const winner = computed(() => {
   if (!score || props.match.status !== "finished") return null;
   if (score[0] === score[1]) return null;
   return score[0] > score[1] ? "home" : "away";
+});
+
+// Menang / Seri / Kalah, from the perspective team's point of view.
+const outcome = computed(() => {
+  const id = props.perspectiveTeamId;
+  const score = props.match.score;
+  if (!id || !score || props.match.status !== "finished") return null;
+  const side =
+    props.match.home.id === id
+      ? "home"
+      : props.match.away.id === id
+        ? "away"
+        : null;
+  if (!side) return null;
+  const [homeGoals, awayGoals] = score;
+  const scored = side === "home" ? homeGoals : awayGoals;
+  const conceded = side === "home" ? awayGoals : homeGoals;
+  if (scored > conceded) return "W";
+  if (scored === conceded) return "D";
+  return "L";
 });
 </script>
 
@@ -76,6 +100,13 @@ const winner = computed(() => {
       </template>
     </p>
     <p
+      v-if="outcome"
+      class="grid w-10 shrink-0 place-items-center border-l px-2"
+    >
+      <ResultBadge :result="outcome" />
+    </p>
+    <p
+      v-else
       class="text-muted-foreground hidden w-32 shrink-0 content-center border-l px-3 text-xs sm:grid"
     >
       <span v-if="match.odds?.[0]" class="flex justify-between tabular-nums">

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ChevronRight, ExternalLink, Star, Tv } from "@lucide/vue";
+import { Star, Tv } from "@lucide/vue";
 import { findLeague } from "~/data/leagues";
 import { findMatch } from "~/data/matches";
 import { news } from "~/data/news";
+import { slugify } from "~/utils/slug";
 
 const route = useRoute();
 const match = computed(() => findMatch(String(route.params.match)));
@@ -39,44 +40,32 @@ function openDetail(tab: string) {
   mainTab.value = "Pertandingan";
 }
 
+const crumbs = computed(() => [
+  { label: "Sepak Bola", to: "/" },
+  ...(league.value
+    ? [
+        {
+          label: league.value.country,
+          country: league.value.country,
+          to: `/negara/${slugify(league.value.country)}`,
+        },
+        {
+          label: `${league.value.name} - ${match.value?.round ?? ""}`,
+          to: `/sepak-bola/${league.value.id}`,
+        },
+      ]
+    : []),
+]);
+
 const starred = ref({ home: false, away: false });
 </script>
 
 <template>
-  <Card v-if="!match">
-    <CardContent class="text-center text-sm">
-      Pertandingan tidak ditemukan.
-      <Button as-child variant="link" size="sm">
-        <NuxtLink to="/">Kembali ke skor</NuxtLink>
-      </Button>
-    </CardContent>
-  </Card>
+  <NotFoundCard v-if="!match" message="Pertandingan tidak ditemukan." />
 
-  <div v-else class="bg-background rounded-lg border shadow-sm">
-    <nav
-      aria-label="Remah"
-      class="text-muted-foreground flex items-center gap-1 border-b px-3 py-2 text-xs"
-    >
-      <NuxtLink to="/" class="hover:text-primary">Sepak Bola</NuxtLink>
-      <template v-if="league">
-        <ChevronRight class="size-3" />
-        <CountryChip :country="league.country" />
-        <span class="uppercase">{{ league.country }}</span>
-        <ChevronRight class="size-3" />
-        <NuxtLink
-          :to="`/sepak-bola/${league.id}`"
-          class="hover:text-primary uppercase"
-          >{{ league.name }} - {{ match.round }}</NuxtLink
-        >
-        <NuxtLink
-          :to="`/sepak-bola/${league.id}`"
-          target="_blank"
-          class="hover:text-primary ml-auto flex items-center gap-1 underline"
-        >
-          <ExternalLink class="size-3" /> Jendela baru
-        </NuxtLink>
-      </template>
-    </nav>
+  <div v-else class="space-y-4">
+    <Card class="gap-0 overflow-hidden py-0">
+    <AppBreadcrumb :items="crumbs" />
 
     <section
       aria-label="Papan skor"
@@ -107,11 +96,7 @@ const starred = ref({ home: false, away: false });
           class="flex flex-col items-center gap-2 text-center hover:underline"
           :class="side === 'home' ? 'order-2' : 'order-1'"
         >
-          <span
-            class="bg-muted grid size-14 place-items-center rounded-full text-base font-bold"
-            aria-hidden="true"
-            >{{ match[side].badge }}</span
-          >
+          <CrestBox :initials="match[side].badge" />
           <span class="font-bold">{{ match[side].name }}</span>
         </NuxtLink>
       </div>
@@ -156,53 +141,41 @@ const starred = ref({ home: false, away: false });
       </Tabs>
     </div>
 
-    <div role="tablist" class="flex flex-wrap gap-2 px-3 py-3">
-      <Button
-        v-for="tab in subTabs"
-        :key="tab"
-        size="sm"
-        role="tab"
-        class="rounded-full text-xs font-bold"
-        :variant="
-          mainTab === 'Pertandingan' && subTab === tab ? 'default' : 'secondary'
-        "
-        :aria-selected="mainTab === 'Pertandingan' && subTab === tab"
-        @click="openDetail(tab)"
-      >
-        {{ tab }}
-      </Button>
+    <div class="p-3">
+      <PillTabs
+        :items="subTabs"
+        :model-value="mainTab === 'Pertandingan' ? subTab : ''"
+        variant="tabs"
+        id-prefix="detail"
+        label="Detail pertandingan"
+        @update:model-value="openDetail"
+      />
     </div>
 
-    <template v-if="mainTab === 'Pertandingan'">
+    <div
+      v-if="mainTab === 'Pertandingan'"
+      :id="tabPanelId('detail', subTab)"
+      role="tabpanel"
+      :aria-labelledby="tabId('detail', subTab)"
+      tabindex="0"
+    >
       <template v-if="subTab === 'Ringkasan'">
         <MatchEvents :match="match" />
 
         <template v-if="match.stats.length">
-          <h3
-            class="bg-muted text-muted-foreground mt-2 px-3 py-1.5 text-xs font-semibold uppercase"
-          >
-            Statistik
-          </h3>
+          <SubHeading>Statistik</SubHeading>
           <MatchStats :stats="match.stats.slice(0, 5)" />
         </template>
 
         <template v-if="match.broadcasters?.length">
-          <h3
-            class="bg-muted text-muted-foreground mt-2 px-3 py-1.5 text-xs font-semibold uppercase"
-          >
-            Chanel televisi
-          </h3>
+          <SubHeading>Chanel televisi</SubHeading>
           <p class="flex items-center gap-2 px-3 py-2 text-sm">
             <Tv class="text-muted-foreground size-4" />
             {{ match.broadcasters.join(", ") }}
           </p>
         </template>
 
-        <h3
-          class="bg-muted text-muted-foreground mt-2 px-3 py-1.5 text-xs font-semibold uppercase"
-        >
-          Informasi pertandingan
-        </h3>
+        <SubHeading>Informasi pertandingan</SubHeading>
         <MatchInfo :match="match" />
       </template>
 
@@ -282,8 +255,8 @@ const starred = ref({ home: false, away: false });
             <TableCell class="text-muted-foreground">
               {{ row.team === "home" ? match.home.name : match.away.name }}
             </TableCell>
-            <TableCell class="text-right font-semibold tabular-nums">
-              {{ row.rating.toFixed(1) }}
+            <TableCell class="text-right">
+              <RatingBadge :rating="row.rating" />
             </TableCell>
             <TableCell class="text-right tabular-nums">{{
               row.goals
@@ -299,11 +272,7 @@ const starred = ref({ home: false, away: false });
       </Table>
 
       <template v-else>
-        <h3
-          class="bg-muted text-muted-foreground px-3 py-1.5 text-xs font-semibold uppercase"
-        >
-          Komentar langsung
-        </h3>
+        <SubHeading>Komentar langsung</SubHeading>
         <ul class="divide-y text-sm">
           <li
             v-for="line in match.commentary"
@@ -318,14 +287,10 @@ const starred = ref({ home: false, away: false });
           </li>
         </ul>
       </template>
-    </template>
+    </div>
 
     <template v-else-if="mainTab === 'H2H'">
-      <h3
-        class="bg-muted text-muted-foreground px-3 py-1.5 text-xs font-semibold uppercase"
-      >
-        Pertemuan terakhir
-      </h3>
+      <SubHeading>Pertemuan terakhir</SubHeading>
       <p
         v-if="match.headToHead.length === 0"
         class="text-muted-foreground p-4 text-sm"
@@ -348,11 +313,7 @@ const starred = ref({ home: false, away: false });
     </template>
 
     <template v-else-if="mainTab === 'Peluang'">
-      <h3
-        class="bg-muted text-muted-foreground px-3 py-1.5 text-xs font-semibold uppercase"
-      >
-        Peluang 1X2
-      </h3>
+      <SubHeading>Peluang 1X2</SubHeading>
       <p class="text-muted-foreground px-3 pt-2 text-xs">
         Angka dummy untuk tampilan, bukan peluang sungguhan.
       </p>
@@ -382,6 +343,8 @@ const starred = ref({ home: false, away: false });
       </Table>
     </template>
 
-    <NewsList v-else :items="news" />
+    </Card>
+
+    <NewsList v-if="mainTab === 'Berita'" :items="news" />
   </div>
 </template>
