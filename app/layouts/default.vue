@@ -1,93 +1,132 @@
 <script setup lang="ts">
+import { Menu, Plus, Pin, Search, Star, User } from "@lucide/vue";
 import { liveCount, sports } from "~/data/matches";
 import { leagues } from "~/data/leagues";
 
 // Static stand-in for the "pinned" list a signed-in user would have.
 const pinned = leagues.slice(0, 2);
+const followedTeams = ["Jerman", "Chelsea"];
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-100 text-slate-900">
-    <header class="bg-slate-900 text-white">
-      <div class="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
-        <NuxtLink to="/" class="text-lg font-bold tracking-tight">
-          Skor<span class="text-emerald-400">Kini</span>
+  <div class="bg-muted text-foreground min-h-screen">
+    <header class="bg-header text-header-foreground">
+      <div class="mx-auto flex max-w-[1240px] items-center gap-2 px-4 py-3">
+        <NuxtLink to="/" class="text-2xl font-extrabold tracking-tight">
+          SKOR<span class="bg-primary ml-1 rounded px-1.5">KINI</span>
         </NuxtLink>
-        <input
-          type="search"
-          placeholder="Cari tim, pemain, kompetisi"
+        <Button
+          variant="ghost"
+          size="icon"
           aria-label="Pencarian"
-          class="ml-auto hidden w-72 rounded bg-slate-800 px-3 py-1.5 text-sm placeholder:text-slate-400 sm:block"
-        />
+          class="hover:bg-header-foreground/10 ml-auto rounded-full"
+        >
+          <Search />
+        </Button>
+        <Button
+          variant="ghost"
+          class="hover:bg-header-foreground/10 hidden gap-2 rounded-full sm:flex"
+        >
+          <User />
+          <span class="font-semibold">Masuk</span>
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Menu"
+          class="hover:bg-header-foreground/10 rounded-full"
+        >
+          <Menu />
+        </Button>
       </div>
-      <nav aria-label="Olahraga" class="border-t border-slate-800">
-        <ul class="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 text-sm">
-          <li v-for="(sport, i) in sports" :key="sport">
-            <span
-              class="flex items-center gap-1.5 px-3 py-2 whitespace-nowrap"
-              :class="
-                i === 0
-                  ? 'border-b-2 border-emerald-400 font-semibold'
-                  : 'text-slate-300'
-              "
-            >
-              {{ sport }}
-              <span
-                v-if="i === 0 && liveCount > 0"
-                class="rounded bg-red-600 px-1.5 text-xs font-semibold"
-                >{{ liveCount }}</span
-              >
-            </span>
-          </li>
-        </ul>
-      </nav>
     </header>
 
-    <div class="mx-auto flex max-w-6xl gap-4 px-4 py-4">
-      <aside class="hidden w-56 shrink-0 space-y-4 lg:block">
-        <nav
-          aria-label="Liga yang disematkan"
-          class="rounded bg-white shadow-sm"
-        >
-          <p class="border-b px-3 py-2 text-xs font-semibold uppercase">
-            Liga Yang Disematkan
-          </p>
+    <nav aria-label="Olahraga" class="bg-background border-b">
+      <ul
+        class="mx-auto flex max-w-[1240px] gap-1 overflow-x-auto px-4 text-sm font-semibold"
+      >
+        <li v-for="(sport, i) in sports" :key="sport">
+          <span
+            class="flex items-center gap-2 px-3 py-3 whitespace-nowrap uppercase"
+            :class="
+              i === 0
+                ? 'border-primary text-primary border-b-3'
+                : 'text-muted-foreground'
+            "
+          >
+            <Star v-if="i === 0" class="size-4" />
+            {{ sport }}
+            <Badge
+              v-if="i === 0 && liveCount > 0"
+              variant="secondary"
+              class="rounded-sm"
+            >
+              {{ liveCount }}
+            </Badge>
+          </span>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="mx-auto flex max-w-[1240px] gap-4 px-4 py-4">
+      <aside class="hidden w-52 shrink-0 space-y-6 lg:block">
+        <nav aria-label="Liga yang disematkan">
+          <h2
+            class="flex items-center gap-2 border-b pb-2 text-xs font-bold uppercase"
+          >
+            <Pin class="size-4" /> Liga Yang Disematkan
+          </h2>
           <ul class="py-1 text-sm">
             <li v-for="league in pinned" :key="league.id">
               <NuxtLink
                 :to="`/sepak-bola/${league.id}`"
-                class="flex items-center gap-2 px-3 py-1.5 hover:bg-slate-50"
+                class="hover:text-primary flex items-center gap-2 py-1.5"
               >
-                <span class="text-amber-500" aria-hidden="true">&#9733;</span>
+                <CountryChip :country="league.country" />
                 {{ league.name }}
               </NuxtLink>
             </li>
           </ul>
         </nav>
 
-        <nav aria-label="Kompetisi" class="rounded bg-white shadow-sm">
-          <p class="border-b px-3 py-2 text-xs font-semibold uppercase">
+        <nav aria-label="Kompetisi">
+          <h2
+            class="flex items-center gap-2 border-b pb-2 text-xs font-bold uppercase"
+          >
             Kompetisi
-          </p>
+          </h2>
           <ul class="py-1 text-sm">
             <li v-for="league in leagues" :key="league.id">
               <NuxtLink
                 :to="`/sepak-bola/${league.id}`"
-                class="block px-3 py-1.5 hover:bg-slate-50"
-                active-class="bg-slate-100 font-semibold"
+                class="hover:text-primary flex items-center gap-2 py-1.5"
+                active-class="text-primary font-semibold"
               >
-                <span class="text-slate-500">{{ league.country }}:</span>
+                <CountryChip :country="league.country" />
                 {{ league.name }}
               </NuxtLink>
             </li>
           </ul>
         </nav>
-        <section class="rounded bg-white shadow-sm">
-          <p class="border-b px-3 py-2 text-xs font-semibold uppercase">
-            Tim Saya
-          </p>
-          <p class="px-3 py-3 text-sm text-slate-500">
-            Belum ada tim yang diikuti.
+
+        <section>
+          <h2
+            class="flex items-center gap-2 border-b pb-2 text-xs font-bold uppercase"
+          >
+            <Star class="size-4 fill-current" /> Tim Saya
+          </h2>
+          <ul class="py-1 text-sm">
+            <li v-for="team in followedTeams" :key="team">
+              <span class="flex items-center gap-2 py-1.5">
+                <CountryChip :country="team" />
+                {{ team }}
+              </span>
+            </li>
+          </ul>
+          <p
+            class="text-primary flex items-center gap-2 py-1.5 text-sm font-semibold"
+          >
+            <Plus class="size-4" /> TAMBAHKAN TIM
           </p>
         </section>
       </aside>
@@ -95,11 +134,26 @@ const pinned = leagues.slice(0, 2);
       <main class="min-w-0 flex-1">
         <slot />
       </main>
+
+      <!-- Ad rail: empty placeholders until a real ad script is wired in. -->
+      <aside
+        aria-label="Iklan"
+        class="hidden w-[300px] shrink-0 space-y-4 xl:block"
+      >
+        <div
+          v-for="slot in ['iklan-atas', 'iklan-bawah']"
+          :key="slot"
+          :data-ad-slot="slot"
+          class="text-muted-foreground bg-background grid h-64 place-items-center border border-dashed text-xs"
+        >
+          Ruang iklan 300&times;250
+        </div>
+      </aside>
     </div>
 
-    <footer class="border-t bg-white">
+    <footer class="bg-background border-t">
       <div
-        class="mx-auto max-w-6xl px-4 py-6 text-xs text-slate-500 sm:flex sm:justify-between"
+        class="text-muted-foreground mx-auto max-w-[1240px] px-4 py-6 text-xs sm:flex sm:justify-between"
       >
         <p>SkorKini — slicing statis dengan data dummy.</p>
         <p>Skor hanya untuk demonstrasi.</p>

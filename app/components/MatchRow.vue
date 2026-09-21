@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Star } from "@lucide/vue";
 import type { Match } from "~/types/match";
 
 const props = defineProps<{ match: Match }>();
@@ -19,56 +20,69 @@ const winner = computed(() => {
 </script>
 
 <template>
-  <div class="flex items-center gap-2 pr-3 text-sm hover:bg-slate-50">
-    <button
-      type="button"
-      class="pl-3 text-slate-300 hover:text-amber-500"
-      :class="starred ? 'text-amber-500' : ''"
+  <div class="hover:bg-muted/60 flex items-stretch text-sm">
+    <Button
+      variant="ghost"
+      size="icon"
+      class="my-auto ml-1 size-6 shrink-0"
+      :class="starred ? 'text-primary' : 'text-muted-foreground/50'"
       :aria-pressed="starred"
       :aria-label="`Ikuti ${match.home.name} - ${match.away.name}`"
       @click="starred = !starred"
     >
-      &#9733;
-    </button>
+      <Star :fill="starred ? 'currentColor' : 'none'" />
+    </Button>
 
     <NuxtLink
       :to="`/pertandingan/${match.id}`"
-      class="flex min-w-0 flex-1 items-center gap-3 py-2"
+      class="flex min-w-0 flex-1 items-center gap-3 py-2 pl-2"
     >
       <span
         class="w-14 shrink-0 text-xs"
-        :class="match.status === 'live' ? 'text-red-600' : 'text-slate-500'"
+        :class="
+          match.status === 'live'
+            ? 'text-primary font-semibold'
+            : 'text-muted-foreground'
+        "
       >
         {{ status }}
       </span>
 
-      <span class="min-w-0 flex-1 space-y-0.5">
+      <span class="min-w-0 flex-1 space-y-1">
         <span
           v-for="side in ['home', 'away'] as const"
           :key="side"
           class="flex items-center gap-2"
-          :class="
-            winner === side ? 'font-semibold' : winner ? 'text-slate-500' : ''
-          "
+          :class="winner === side || !winner ? 'font-semibold' : ''"
         >
           <TeamBadge :badge="match[side].badge" />
           <span class="truncate">{{ match[side].name }}</span>
         </span>
       </span>
-
-      <span
-        class="w-6 shrink-0 space-y-0.5 text-right font-semibold tabular-nums"
-        :class="match.status === 'live' ? 'text-red-600' : ''"
-      >
-        <template v-if="match.score">
-          <span class="block">{{ match.score[0] }}</span>
-          <span class="block">{{ match.score[1] }}</span>
-        </template>
-        <template v-else>
-          <span class="block text-slate-400">-</span>
-          <span class="block text-slate-400">-</span>
-        </template>
-      </span>
     </NuxtLink>
+
+    <!-- Score and odds sit in their own bordered columns, like a results grid. -->
+    <p
+      class="grid w-16 shrink-0 content-center gap-1 border-l px-3 py-2 text-left font-bold tabular-nums"
+      :class="match.status === 'live' ? 'text-primary' : ''"
+    >
+      <template v-if="match.score">
+        <span>{{ match.score[0] }}</span>
+        <span>{{ match.score[1] }}</span>
+      </template>
+      <template v-else>
+        <span class="text-muted-foreground">-</span>
+        <span class="text-muted-foreground">-</span>
+      </template>
+    </p>
+    <p
+      class="text-muted-foreground hidden w-32 shrink-0 content-center border-l px-3 text-xs sm:grid"
+    >
+      <span v-if="match.odds?.[0]" class="flex justify-between tabular-nums">
+        <span>{{ match.odds[0].home.toFixed(2) }}</span>
+        <span>{{ match.odds[0].draw.toFixed(2) }}</span>
+        <span>{{ match.odds[0].away.toFixed(2) }}</span>
+      </span>
+    </p>
   </div>
 </template>

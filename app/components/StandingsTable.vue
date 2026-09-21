@@ -4,60 +4,64 @@ import type { StandingRow } from "~/types/match";
 defineProps<{ rows: StandingRow[] }>();
 
 const formColor = {
-  W: "bg-emerald-500",
-  D: "bg-slate-400",
-  L: "bg-red-500",
+  W: "bg-emerald-500 text-white",
+  D: "bg-muted-foreground text-white",
+  L: "bg-destructive text-white",
 };
 </script>
 
 <template>
-  <div class="overflow-x-auto rounded bg-white shadow-sm">
-    <table class="w-full text-sm">
-      <thead class="bg-slate-50 text-xs text-slate-500">
-        <tr>
-          <th scope="col" class="px-2 py-2 text-left">#</th>
-          <th scope="col" class="px-2 py-2 text-left">Tim</th>
-          <th scope="col" class="px-2 py-2">M</th>
-          <th scope="col" class="px-2 py-2">M-S-K</th>
-          <th scope="col" class="px-2 py-2">Gol</th>
-          <th scope="col" class="px-2 py-2">Poin</th>
-          <th scope="col" class="px-2 py-2 text-left">Performa</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y">
-        <tr v-for="row in rows" :key="row.teamId" class="hover:bg-slate-50">
-          <td class="px-2 py-2 text-slate-500 tabular-nums">
-            {{ row.position }}
-          </td>
-          <td class="px-2 py-2">
-            <NuxtLink :to="`/tim/${row.teamId}`" class="hover:underline">
-              {{ row.team }}
-            </NuxtLink>
-          </td>
-          <td class="px-2 py-2 text-center tabular-nums">{{ row.played }}</td>
-          <td class="px-2 py-2 text-center tabular-nums">
-            {{ row.won }}-{{ row.drawn }}-{{ row.lost }}
-          </td>
-          <td class="px-2 py-2 text-center tabular-nums">
-            {{ row.goalsFor }}:{{ row.goalsAgainst }}
-          </td>
-          <td class="px-2 py-2 text-center font-semibold tabular-nums">
-            {{ row.points }}
-          </td>
-          <td class="px-2 py-2">
-            <span class="flex gap-0.5">
-              <span
-                v-for="(result, i) in row.form"
-                :key="i"
-                class="grid size-4 place-items-center rounded text-[10px] font-bold text-white"
-                :class="formColor[result]"
-                :title="result"
-                >{{ result }}</span
-              >
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <Card class="overflow-hidden py-0">
+    <CardContent class="px-0">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>#</TableHead>
+            <TableHead>Tim</TableHead>
+            <TableHead class="text-center">M</TableHead>
+            <TableHead class="text-center">M-S-K</TableHead>
+            <TableHead class="text-center">Gol</TableHead>
+            <TableHead class="text-center">Poin</TableHead>
+            <TableHead>Performa</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow v-for="row in rows" :key="row.teamId">
+            <TableCell class="text-muted-foreground tabular-nums">
+              {{ row.position }}
+            </TableCell>
+            <TableCell>
+              <NuxtLink :to="`/tim/${row.teamId}`" class="hover:underline">
+                {{ row.team }}
+              </NuxtLink>
+            </TableCell>
+            <TableCell class="text-center tabular-nums">{{
+              row.played
+            }}</TableCell>
+            <TableCell class="text-center tabular-nums">
+              {{ row.won }}-{{ row.drawn }}-{{ row.lost }}
+            </TableCell>
+            <TableCell class="text-center tabular-nums">
+              {{ row.goalsFor }}:{{ row.goalsAgainst }}
+            </TableCell>
+            <TableCell class="text-center font-semibold tabular-nums">
+              {{ row.points }}
+            </TableCell>
+            <TableCell>
+              <span class="flex gap-0.5">
+                <Badge
+                  v-for="(result, i) in row.form"
+                  :key="i"
+                  class="size-4 justify-center rounded-sm p-0 text-[10px] font-bold"
+                  :class="formColor[result]"
+                  :title="result"
+                  >{{ result }}</Badge
+                >
+              </span>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </CardContent>
+  </Card>
 </template>

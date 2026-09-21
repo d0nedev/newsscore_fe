@@ -10,6 +10,12 @@ export default defineNuxtConfig({
   ssr: false,
   nitro: { preset: "static" },
 
+  // shadcn-vue ui: scan only .vue so the barrel index.ts doesn't collide with the component name
+  components: [
+    { path: "~/components/ui", extensions: [".vue"], pathPrefix: false },
+    "~/components",
+  ],
+
   css: ["~/assets/css/main.css"],
   vite: { plugins: [tailwindcss()] },
 

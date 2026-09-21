@@ -3,8 +3,9 @@
 import { createReadStream, existsSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join, normalize } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const root = new URL("../../.output/public/", import.meta.url).pathname;
+const root = fileURLToPath(new URL("../../.output/public/", import.meta.url));
 const types = {
   ".html": "text/html",
   ".js": "text/javascript",

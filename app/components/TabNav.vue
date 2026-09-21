@@ -4,21 +4,20 @@ defineEmits<{ "update:modelValue": [string] }>();
 </script>
 
 <template>
-  <div class="flex gap-1 overflow-x-auto border-b bg-white px-2">
-    <button
-      v-for="tab in tabs"
-      :key="tab"
-      type="button"
-      class="px-3 py-2 text-sm whitespace-nowrap"
-      :class="
-        tab === modelValue
-          ? 'border-b-2 border-emerald-500 font-semibold'
-          : 'text-slate-500'
-      "
-      :aria-pressed="tab === modelValue"
-      @click="$emit('update:modelValue', tab)"
-    >
-      {{ tab }}
-    </button>
-  </div>
+  <Tabs
+    :model-value="modelValue"
+    class="w-full"
+    @update:model-value="$emit('update:modelValue', String($event))"
+  >
+    <TabsList variant="line" class="w-full justify-start overflow-x-auto">
+      <TabsTrigger
+        v-for="tab in tabs"
+        :key="tab"
+        :value="tab"
+        class="flex-none"
+      >
+        {{ tab }}
+      </TabsTrigger>
+    </TabsList>
+  </Tabs>
 </template>

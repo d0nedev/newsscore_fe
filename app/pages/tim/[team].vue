@@ -33,34 +33,41 @@ const capacity = new Intl.NumberFormat("id-ID");
 </script>
 
 <template>
-  <p v-if="!team" class="rounded bg-white p-6 text-center text-sm">
-    Tim tidak ditemukan.
-    <NuxtLink to="/" class="underline">Kembali ke skor</NuxtLink>
-  </p>
+  <Card v-if="!team">
+    <CardContent class="text-center text-sm">
+      Tim tidak ditemukan.
+      <Button as-child variant="link" size="sm">
+        <NuxtLink to="/">Kembali ke skor</NuxtLink>
+      </Button>
+    </CardContent>
+  </Card>
 
   <div v-else class="space-y-4">
-    <header class="flex items-center gap-3 rounded bg-white p-4 shadow-sm">
-      <span
-        class="grid size-12 shrink-0 place-items-center rounded-full bg-slate-200 font-bold"
-        aria-hidden="true"
-        >{{ team.badge }}</span
-      >
-      <div>
-        <h1 class="text-xl font-semibold">{{ team.name }}</h1>
-        <p class="text-sm text-slate-500">
-          <NuxtLink
-            v-if="league"
-            :to="`/sepak-bola/${league.id}`"
-            class="hover:underline"
-            >{{ league.country }}: {{ league.name }}</NuxtLink
-          >
-        </p>
-        <p class="text-sm text-slate-500">
-          Stadion: {{ team.venue }} · Kapasitas:
-          {{ capacity.format(team.capacity) }} · Berdiri: {{ team.founded }}
-        </p>
-      </div>
-    </header>
+    <Card>
+      <CardContent class="flex items-center gap-3">
+        <Badge
+          variant="secondary"
+          class="size-12 shrink-0 justify-center rounded-full p-0 text-base font-bold"
+          aria-hidden="true"
+          >{{ team.badge }}</Badge
+        >
+        <div>
+          <CardTitle as="h1" class="text-xl">{{ team.name }}</CardTitle>
+          <CardDescription>
+            <NuxtLink
+              v-if="league"
+              :to="`/sepak-bola/${league.id}`"
+              class="hover:underline"
+              >{{ league.country }}: {{ league.name }}</NuxtLink
+            >
+          </CardDescription>
+          <CardDescription>
+            Stadion: {{ team.venue }} · Kapasitas:
+            {{ capacity.format(team.capacity) }} · Berdiri: {{ team.founded }}
+          </CardDescription>
+        </div>
+      </CardContent>
+    </Card>
 
     <TabNav v-model="tab" :tabs="tabs" />
 

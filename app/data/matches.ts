@@ -22,13 +22,28 @@ export const matches: Match[] = [
     date: "20.09.2026",
     round: "Pekan 5",
     venue: "Stadion Barat",
+    referee: "A. Taylor (Ing)",
+    attendance: 17102,
+    broadcasters: ["SkorTV", "SkorGo"],
     home: team("brentford", "Brentford", "BR"),
     away: team("chelsea", "Chelsea", "CH"),
     score: [1, 2],
     halfTime: [1, 1],
     events: [
-      { minute: 12, team: "away", type: "goal", player: "N. Jackson" },
-      { minute: 38, team: "home", type: "goal", player: "B. Mbeumo" },
+      {
+        minute: 12,
+        team: "away",
+        type: "goal",
+        player: "N. Jackson",
+        assist: "C. Palmer",
+      },
+      {
+        minute: 38,
+        team: "home",
+        type: "goal",
+        player: "B. Mbeumo",
+        assist: "M. Damsgaard",
+      },
       { minute: 44, team: "home", type: "yellow", player: "C. Norgaard" },
       { minute: 61, team: "away", type: "goal", player: "C. Palmer" },
       {
@@ -36,7 +51,7 @@ export const matches: Match[] = [
         team: "home",
         type: "sub",
         player: "K. Schade",
-        note: "masuk untuk Y. Wissa",
+        assist: "Y. Wissa",
       },
     ],
     stats: [
@@ -316,9 +331,7 @@ export const matches: Match[] = [
     score: null,
     events: [],
     ...noDetail,
-    odds: [
-      { bookmaker: "SkorBet", home: 2.6, draw: 3.3, away: 2.7 },
-    ],
+    odds: [{ bookmaker: "SkorBet", home: 2.6, draw: 3.3, away: 2.7 }],
   },
   {
     id: "gir-rma",

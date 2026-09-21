@@ -38,41 +38,47 @@ const tab = ref("Ringkasan");
 </script>
 
 <template>
-  <p v-if="!name" class="rounded bg-white p-6 text-center text-sm">
-    Pemain tidak ditemukan.
-    <NuxtLink to="/" class="underline">Kembali ke skor</NuxtLink>
-  </p>
+  <Card v-if="!name">
+    <CardContent class="text-center text-sm">
+      Pemain tidak ditemukan.
+      <Button as-child variant="link" size="sm">
+        <NuxtLink to="/">Kembali ke skor</NuxtLink>
+      </Button>
+    </CardContent>
+  </Card>
 
   <div v-else class="space-y-4">
-    <header class="rounded bg-white p-4 shadow-sm">
-      <h1 class="text-xl font-semibold">{{ name }}</h1>
-      <p class="text-sm text-slate-500">
-        <NuxtLink v-if="team" :to="`/tim/${team.id}`" class="hover:underline">{{
-          team.name
-        }}</NuxtLink>
-        <template v-if="player">
-          · {{ player.position }} · {{ player.country }}
-        </template>
-        <template v-else-if="squadEntry">
-          · {{ squadEntry.entry.position }} · {{ squadEntry.entry.age }} tahun
-        </template>
-      </p>
-      <p v-if="player" class="text-sm text-slate-500">
-        Usia: {{ player.age }} · Tinggi: {{ player.height }} cm · Kaki:
-        {{ player.foot }} · Nomor: {{ player.number }}
-      </p>
-    </header>
+    <Card>
+      <CardHeader>
+        <CardTitle as="h1" class="text-xl">{{ name }}</CardTitle>
+        <CardDescription>
+          <NuxtLink
+            v-if="team"
+            :to="`/tim/${team.id}`"
+            class="hover:underline"
+            >{{ team.name }}</NuxtLink
+          >
+          <template v-if="player">
+            · {{ player.position }} · {{ player.country }}
+          </template>
+          <template v-else-if="squadEntry">
+            · {{ squadEntry.entry.position }} · {{ squadEntry.entry.age }} tahun
+          </template>
+        </CardDescription>
+        <CardDescription v-if="player">
+          Usia: {{ player.age }} · Tinggi: {{ player.height }} cm · Kaki:
+          {{ player.foot }} · Nomor: {{ player.number }}
+        </CardDescription>
+      </CardHeader>
+    </Card>
 
     <TabNav v-if="player" v-model="tab" :tabs="tabs" />
 
-    <section
-      v-if="season && tab === 'Ringkasan'"
-      class="rounded bg-white shadow-sm"
-    >
-      <h2 class="border-b bg-slate-50 px-3 py-2 text-sm font-semibold">
-        Statistik musim ini
-      </h2>
-      <dl class="grid grid-cols-2 gap-px bg-slate-100 sm:grid-cols-4">
+    <Card v-if="season && tab === 'Ringkasan'" class="gap-0 py-0">
+      <CardHeader class="border-b px-3 py-2 [.border-b]:pb-2">
+        <CardTitle as="h2" class="text-sm">Statistik musim ini</CardTitle>
+      </CardHeader>
+      <CardContent class="grid grid-cols-2 gap-3 p-3 sm:grid-cols-4">
         <div
           v-for="stat in [
             { label: 'Main', value: season.matches },
@@ -81,74 +87,78 @@ const tab = ref("Ringkasan");
             { label: 'Menit', value: season.minutes },
           ]"
           :key="stat.label"
-          class="bg-white p-3 text-center"
+          class="bg-muted/50 rounded-md p-3 text-center"
         >
-          <dt class="text-xs text-slate-500">{{ stat.label }}</dt>
-          <dd class="text-lg font-semibold tabular-nums">{{ stat.value }}</dd>
+          <p class="text-muted-foreground text-xs">{{ stat.label }}</p>
+          <p class="text-lg font-semibold tabular-nums">{{ stat.value }}</p>
         </div>
-      </dl>
-    </section>
+      </CardContent>
+    </Card>
 
-    <section
+    <Card
       v-if="player?.transfers.length && tab === 'Transfer'"
-      class="overflow-hidden rounded bg-white shadow-sm"
+      class="gap-0 overflow-hidden py-0"
     >
-      <h2 class="border-b bg-slate-50 px-3 py-2 text-sm font-semibold">
-        Transfer
-      </h2>
-      <table class="w-full text-sm">
-        <thead class="text-xs text-slate-500">
-          <tr>
-            <th scope="col" class="px-3 py-1.5 text-left">Musim</th>
-            <th scope="col" class="px-3 py-1.5 text-left">Dari</th>
-            <th scope="col" class="px-3 py-1.5 text-left">Ke</th>
-            <th scope="col" class="px-3 py-1.5 text-right">Nilai</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y">
-          <tr v-for="transfer in player.transfers" :key="transfer.season">
-            <td class="px-3 py-1.5">{{ transfer.season }}</td>
-            <td class="px-3 py-1.5">{{ transfer.from }}</td>
-            <td class="px-3 py-1.5">{{ transfer.to }}</td>
-            <td class="px-3 py-1.5 text-right tabular-nums">
-              {{ transfer.fee }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+      <CardHeader class="border-b px-3 py-2 [.border-b]:pb-2">
+        <CardTitle as="h2" class="text-sm">Transfer</CardTitle>
+      </CardHeader>
+      <CardContent class="px-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Musim</TableHead>
+              <TableHead>Dari</TableHead>
+              <TableHead>Ke</TableHead>
+              <TableHead class="text-right">Nilai</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow
+              v-for="transfer in player.transfers"
+              :key="transfer.season"
+            >
+              <TableCell>{{ transfer.season }}</TableCell>
+              <TableCell>{{ transfer.from }}</TableCell>
+              <TableCell>{{ transfer.to }}</TableCell>
+              <TableCell class="text-right tabular-nums">{{
+                transfer.fee
+              }}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
 
-    <section
-      v-if="player && tab === 'Cedera'"
-      class="overflow-hidden rounded bg-white shadow-sm"
-    >
-      <h2 class="border-b bg-slate-50 px-3 py-2 text-sm font-semibold">
-        Sejarah Cedera
-      </h2>
-      <p
-        v-if="!player.injuries.length"
-        class="px-3 py-3 text-sm text-slate-500"
-      >
-        Tidak ada catatan cedera.
-      </p>
-      <table v-else class="w-full text-sm">
-        <thead class="text-xs text-slate-500">
-          <tr>
-            <th scope="col" class="px-3 py-1.5 text-left">Musim</th>
-            <th scope="col" class="px-3 py-1.5 text-left">Cedera</th>
-            <th scope="col" class="px-3 py-1.5 text-right">Periode</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y">
-          <tr v-for="injury in player.injuries" :key="injury.from">
-            <td class="px-3 py-1.5">{{ injury.season }}</td>
-            <td class="px-3 py-1.5">{{ injury.issue }}</td>
-            <td class="px-3 py-1.5 text-right tabular-nums">
-              {{ injury.from }} - {{ injury.to }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+    <Card v-if="player && tab === 'Cedera'" class="gap-0 overflow-hidden py-0">
+      <CardHeader class="border-b px-3 py-2 [.border-b]:pb-2">
+        <CardTitle as="h2" class="text-sm">Sejarah Cedera</CardTitle>
+      </CardHeader>
+      <CardContent class="px-0">
+        <p
+          v-if="!player.injuries.length"
+          class="text-muted-foreground px-3 py-3 text-sm"
+        >
+          Tidak ada catatan cedera.
+        </p>
+        <Table v-else>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Musim</TableHead>
+              <TableHead>Cedera</TableHead>
+              <TableHead class="text-right">Periode</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-for="injury in player.injuries" :key="injury.from">
+              <TableCell>{{ injury.season }}</TableCell>
+              <TableCell>{{ injury.issue }}</TableCell>
+              <TableCell class="text-right tabular-nums">
+                {{ injury.from }} - {{ injury.to }}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   </div>
 </template>

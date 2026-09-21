@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ChevronLeft, ChevronRight } from "@lucide/vue";
 import { matchDates, today } from "~/data/matches";
 
 const model = defineModel<string>({ required: true });
@@ -23,42 +24,46 @@ function label(date: string) {
 <template>
   <nav
     aria-label="Tanggal pertandingan"
-    class="flex items-center rounded border border-slate-200"
+    class="flex items-center gap-1 rounded-full border px-1"
   >
-    <button
-      type="button"
-      class="px-2 py-1 text-slate-500 disabled:opacity-30"
+    <Button
+      variant="ghost"
+      size="icon"
+      class="size-8"
       aria-label="Tanggal sebelumnya"
       :disabled="index <= 0"
       @click="step(-1)"
     >
-      &lsaquo;
-    </button>
+      <ChevronLeft />
+    </Button>
+    <slot />
     <ul class="flex flex-1 justify-center gap-1 overflow-x-auto">
       <li v-for="date in matchDates" :key="date">
-        <button
-          type="button"
-          class="px-2 py-1 text-sm whitespace-nowrap"
+        <Button
+          variant="ghost"
+          size="sm"
+          class="whitespace-nowrap"
           :class="
             date === model
-              ? 'border-b-2 border-emerald-500 font-semibold'
-              : 'text-slate-500'
+              ? 'border-primary rounded-none border-b-2 font-semibold'
+              : 'text-muted-foreground'
           "
           :aria-pressed="date === model"
           @click="model = date"
         >
           {{ label(date) }}
-        </button>
+        </Button>
       </li>
     </ul>
-    <button
-      type="button"
-      class="px-2 py-1 text-slate-500 disabled:opacity-30"
+    <Button
+      variant="ghost"
+      size="icon"
+      class="size-8"
       aria-label="Tanggal berikutnya"
       :disabled="index >= matchDates.length - 1"
       @click="step(1)"
     >
-      &rsaquo;
-    </button>
+      <ChevronRight />
+    </Button>
   </nav>
 </template>

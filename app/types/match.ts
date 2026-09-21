@@ -13,6 +13,8 @@ export interface MatchEvent {
   type: "goal" | "yellow" | "red" | "sub";
   player: string;
   note?: string;
+  /** Goal assist, or the player replaced on a substitution. */
+  assist?: string;
 }
 
 export interface MatchStat {
@@ -73,6 +75,9 @@ export interface Match {
   odds?: MatchOdds[];
   commentary?: CommentaryLine[];
   playerStats?: PlayerMatchStat[];
+  referee?: string;
+  attendance?: number;
+  broadcasters?: string[];
 }
 
 export interface StandingRow {
@@ -132,4 +137,13 @@ export interface PlayerProfile {
   season: { matches: number; goals: number; assists: number; minutes: number };
   transfers: { season: string; from: string; to: string; fee: string }[];
   injuries: { season: string; issue: string; from: string; to: string }[];
+}
+
+export interface NewsItem {
+  id: string;
+  category: string;
+  title: string;
+  summary: string;
+  /** Relative label; the slice has no real timestamps. */
+  published: string;
 }

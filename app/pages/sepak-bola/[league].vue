@@ -31,17 +31,23 @@ const withOdds = computed(() =>
 </script>
 
 <template>
-  <p v-if="!league" class="rounded bg-white p-6 text-center text-sm">
-    Kompetisi tidak ditemukan.
-    <NuxtLink to="/" class="underline">Kembali ke skor</NuxtLink>
-  </p>
+  <Card v-if="!league">
+    <CardContent class="text-center text-sm">
+      Kompetisi tidak ditemukan.
+      <Button as-child variant="link" size="sm">
+        <NuxtLink to="/">Kembali ke skor</NuxtLink>
+      </Button>
+    </CardContent>
+  </Card>
 
   <div v-else class="space-y-4">
-    <header class="rounded bg-white p-4 shadow-sm">
-      <p class="text-sm text-slate-500">{{ league.country }}</p>
-      <h1 class="text-xl font-semibold">{{ league.name }}</h1>
-      <p class="text-sm text-slate-500">Musim {{ league.season }}</p>
-    </header>
+    <Card>
+      <CardHeader>
+        <CardDescription>{{ league.country }}</CardDescription>
+        <CardTitle as="h1" class="text-xl">{{ league.name }}</CardTitle>
+        <CardDescription>Musim {{ league.season }}</CardDescription>
+      </CardHeader>
+    </Card>
 
     <TabNav v-model="tab" :tabs="tabs" />
 
@@ -61,26 +67,30 @@ const withOdds = computed(() =>
     />
     <StandingsTable v-else-if="tab === 'Klasemen'" :rows="league.standings" />
     <OddsList v-else-if="tab === 'Peluang'" :matches="withOdds" />
-    <section v-else class="overflow-hidden rounded bg-white shadow-sm">
-      <h2 class="border-b bg-slate-50 px-3 py-2 text-sm font-semibold">
-        Arsip musim
-      </h2>
-      <table class="w-full text-sm">
-        <thead class="text-xs text-slate-500">
-          <tr>
-            <th scope="col" class="px-3 py-1.5 text-left">Musim</th>
-            <th scope="col" class="px-3 py-1.5 text-left">Juara</th>
-            <th scope="col" class="px-3 py-1.5 text-left">Runner-up</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y">
-          <tr v-for="season in league.archive" :key="season.season">
-            <td class="px-3 py-1.5 tabular-nums">{{ season.season }}</td>
-            <td class="px-3 py-1.5 font-medium">{{ season.winner }}</td>
-            <td class="px-3 py-1.5 text-slate-500">{{ season.runnerUp }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+    <Card v-else class="gap-0 overflow-hidden py-0">
+      <CardHeader class="border-b px-3 py-2 [.border-b]:pb-2">
+        <CardTitle as="h2" class="text-sm">Arsip musim</CardTitle>
+      </CardHeader>
+      <CardContent class="px-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Musim</TableHead>
+              <TableHead>Juara</TableHead>
+              <TableHead>Runner-up</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-for="season in league.archive" :key="season.season">
+              <TableCell class="tabular-nums">{{ season.season }}</TableCell>
+              <TableCell class="font-medium">{{ season.winner }}</TableCell>
+              <TableCell class="text-muted-foreground">{{
+                season.runnerUp
+              }}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   </div>
 </template>

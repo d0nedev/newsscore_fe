@@ -23,53 +23,53 @@ const label = {
 
 <template>
   <div class="space-y-3">
-    <section
+    <Card
       v-for="group in groups"
       :key="group.position"
-      class="overflow-hidden rounded bg-white shadow-sm"
+      class="gap-0 overflow-hidden py-0"
     >
-      <h3 class="border-b bg-slate-50 px-3 py-2 text-sm font-semibold">
-        {{ label[group.position] }}
-      </h3>
-      <table class="w-full text-sm">
-        <thead class="text-xs text-slate-500">
-          <tr>
-            <th scope="col" class="px-3 py-1.5 text-left">Nama</th>
-            <th scope="col" class="px-2 py-1.5">Usia</th>
-            <th scope="col" class="px-2 py-1.5">Main</th>
-            <th scope="col" class="px-2 py-1.5">Gol</th>
-            <th scope="col" class="px-2 py-1.5">Assist</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y">
-          <tr
-            v-for="player in group.players"
-            :key="player.id"
-            class="hover:bg-slate-50"
-          >
-            <td class="px-3 py-1.5">
-              <NuxtLink :to="`/pemain/${player.id}`" class="hover:underline">
-                <span class="mr-2 text-slate-400 tabular-nums">{{
-                  player.number
-                }}</span>
-                {{ player.name }}
-              </NuxtLink>
-            </td>
-            <td class="px-2 py-1.5 text-center tabular-nums">
-              {{ player.age }}
-            </td>
-            <td class="px-2 py-1.5 text-center tabular-nums">
-              {{ player.matches }}
-            </td>
-            <td class="px-2 py-1.5 text-center tabular-nums">
-              {{ player.goals }}
-            </td>
-            <td class="px-2 py-1.5 text-center tabular-nums">
-              {{ player.assists }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+      <CardHeader class="border-b px-3 py-2 [.border-b]:pb-2">
+        <CardTitle as="h3" class="text-sm">{{
+          label[group.position]
+        }}</CardTitle>
+      </CardHeader>
+      <CardContent class="px-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nama</TableHead>
+              <TableHead class="text-center">Usia</TableHead>
+              <TableHead class="text-center">Main</TableHead>
+              <TableHead class="text-center">Gol</TableHead>
+              <TableHead class="text-center">Assist</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-for="player in group.players" :key="player.id">
+              <TableCell>
+                <NuxtLink :to="`/pemain/${player.id}`" class="hover:underline">
+                  <span class="text-muted-foreground mr-2 tabular-nums">{{
+                    player.number
+                  }}</span>
+                  {{ player.name }}
+                </NuxtLink>
+              </TableCell>
+              <TableCell class="text-center tabular-nums">{{
+                player.age
+              }}</TableCell>
+              <TableCell class="text-center tabular-nums">{{
+                player.matches
+              }}</TableCell>
+              <TableCell class="text-center tabular-nums">{{
+                player.goals
+              }}</TableCell>
+              <TableCell class="text-center tabular-nums">{{
+                player.assists
+              }}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   </div>
 </template>
