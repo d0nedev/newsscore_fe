@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "newsscore-fe",
+  "compatibility_date": "2025-09-22",
+  // Static SPA: `nuxt generate` writes .output/public, no Worker script needed.
+  "assets": {
+    "directory": "./.output/public",
+    "not_found_handling": "single-page-application"
+  }
+}
