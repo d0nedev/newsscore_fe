@@ -37,14 +37,14 @@ soal frontend, melainkan mengganti preset ke `node-server` dan memakai
 Rangkanya sudah berdiri dan keputusan pentingnya sudah diambil. Tidak ada yang
 perlu dibangun ulang.
 
-| Berkas | Isi | Layak dipakai? |
-| --- | --- | --- |
-| `app/services/api-client.ts` | `apiFetch<T>()` — satu pintu ke API, memasang `baseURL`, `credentials: "include"`, `retry: 0` | ya |
-| `app/utils/api-error.ts` | kelas `ApiError`, `toApiError()`, `errorMessage()`; 8 jenis galat dipetakan dari status HTTP | ya |
-| `app/types/api.ts` | `ApiResponse<T>`, `CursorPage<T>`, `ApiErrorBody` | ya |
-| `app/plugins/vue-query.ts` | `QueryClient` dengan `staleTime` 30 detik dan kebijakan ulang-coba yang sadar `ApiError` | ya |
-| `app/components/ErrorState.vue` | tampilan galat + tombol coba lagi, memakai `errorMessage()` | ya |
-| `@tanstack/vue-query`, `zod` | sudah terpasang sebagai dependensi | ya |
+| Berkas                          | Isi                                                                                           | Layak dipakai? |
+| ------------------------------- | --------------------------------------------------------------------------------------------- | -------------- |
+| `app/services/api-client.ts`    | `apiFetch<T>()` — satu pintu ke API, memasang `baseURL`, `credentials: "include"`, `retry: 0` | ya             |
+| `app/utils/api-error.ts`        | kelas `ApiError`, `toApiError()`, `errorMessage()`; 8 jenis galat dipetakan dari status HTTP  | ya             |
+| `app/types/api.ts`              | `ApiResponse<T>`, `CursorPage<T>`, `ApiErrorBody`                                             | ya             |
+| `app/plugins/vue-query.ts`      | `QueryClient` dengan `staleTime` 30 detik dan kebijakan ulang-coba yang sadar `ApiError`      | ya             |
+| `app/components/ErrorState.vue` | tampilan galat + tombol coba lagi, memakai `errorMessage()`                                   | ya             |
+| `@tanstack/vue-query`, `zod`    | sudah terpasang sebagai dependensi                                                            | ya             |
 
 Keputusan yang sudah tertanam di dalamnya, jangan diubah tanpa alasan:
 
@@ -85,7 +85,7 @@ Halaman tidak perlu tahu datanya datang dari array di memori atau dari jaringan.
 Yang berubah hanyalah nilai kembaliannya: dari nilai langsung menjadi hasil
 kueri yang punya status memuat dan gagal.
 
-Karena itu jangan membuat lapisan *repository* sekarang. Belum ada implementasi
+Karena itu jangan membuat lapisan _repository_ sekarang. Belum ada implementasi
 kedua yang nyata, jadi belum ada yang perlu diabstraksi. Fungsi pencari sudah
 menjadi abstraksinya.
 
@@ -124,7 +124,7 @@ pesan jelas, bukan komponen acak dengan `undefined`.
 Isinya `useQuery` dengan kunci cache yang stabil:
 
 ```ts
-queryKey: ["matches", "byDate", date]
+queryKey: ["matches", "byDate", date];
 ```
 
 Kunci harus memuat setiap variabel yang memengaruhi hasil. Kunci yang salah
@@ -168,7 +168,9 @@ menyambungkan keluhan pengguna dengan log server.
 Badan galat harus mengikuti `ApiErrorBody`:
 
 ```json
-{ "error": { "code": "...", "message": "...", "details": { "field": "pesan" } } }
+{
+  "error": { "code": "...", "message": "...", "details": { "field": "pesan" } }
+}
 ```
 
 `details` hanya dibaca untuk galat validasi, dan hanya nilai bertipe string
@@ -238,7 +240,7 @@ bersamaan.
 
 ## 9. Yang sebaiknya tidak dilakukan
 
-- **Jangan** membuat lapisan repository atau pola *store* global sebelum ada
+- **Jangan** membuat lapisan repository atau pola _store_ global sebelum ada
   kebutuhan nyata. TanStack Query sudah menjadi cache server-state; menaruh
   Pinia di atasnya berarti dua sumber kebenaran untuk data yang sama.
 - **Jangan** menyimpan token di `localStorage`. Keputusan cookie `HttpOnly`

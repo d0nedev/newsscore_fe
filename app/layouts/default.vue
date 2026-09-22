@@ -204,7 +204,9 @@ const year = new Date().getFullYear();
           </h2>
           <ul class="mt-3 space-y-2 text-sm">
             <li>
-              <NuxtLink to="/" class="hover:text-primary">Skor Langsung</NuxtLink>
+              <NuxtLink to="/" class="hover:text-primary"
+                >Skor Langsung</NuxtLink
+              >
             </li>
             <li v-for="league in leagues" :key="league.id">
               <NuxtLink

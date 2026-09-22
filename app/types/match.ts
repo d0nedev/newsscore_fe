@@ -167,10 +167,7 @@ export interface PlayerMatchLogEntry {
 }
 
 export type CareerGroup =
-  | "Liga"
-  | "Piala Domestik"
-  | "Piala Internasional"
-  | "Tim Nasional";
+  "Liga" | "Piala Domestik" | "Piala Internasional" | "Tim Nasional";
 
 export interface CareerRow {
   group: CareerGroup;

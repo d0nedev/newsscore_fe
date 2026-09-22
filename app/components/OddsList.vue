@@ -28,7 +28,10 @@ const rows = computed(() =>
     <TableBody>
       <TableRow v-for="{ match, odds } in rows" :key="match.id">
         <TableCell class="pl-4">
-          <NuxtLink :to="`/pertandingan/${match.id}`" class="hover:text-primary">
+          <NuxtLink
+            :to="`/pertandingan/${match.id}`"
+            class="hover:text-primary"
+          >
             {{ match.home.name }} - {{ match.away.name }}
           </NuxtLink>
           <span class="text-muted-foreground block text-xs"

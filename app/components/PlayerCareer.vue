@@ -53,7 +53,9 @@ const total = computed(() =>
           <TableHead>Tim</TableHead>
           <TableHead>Kompetisi</TableHead>
           <TableHead class="w-12 text-center">Nilai</TableHead>
-          <TableHead class="w-12 text-center" title="Penampilan">Main</TableHead>
+          <TableHead class="w-12 text-center" title="Penampilan"
+            >Main</TableHead
+          >
           <template v-if="goalkeeper">
             <TableHead class="w-14 text-center" title="Persentase penyelamatan">
               SV%
@@ -121,7 +123,9 @@ const total = computed(() =>
         </TableRow>
 
         <TableRow class="bg-muted/60 font-semibold">
-          <TableCell class="pl-4 text-xs uppercase" colspan="4">Total</TableCell>
+          <TableCell class="pl-4 text-xs uppercase" colspan="4"
+            >Total</TableCell
+          >
           <TableCell class="text-center tabular-nums">{{
             total.apps
           }}</TableCell>

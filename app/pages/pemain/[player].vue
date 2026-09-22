@@ -35,7 +35,9 @@ const crumbs = computed(() => [
         },
       ]
     : []),
-  ...(team.value ? [{ label: team.value.name, to: `/tim/${team.value.id}` }] : []),
+  ...(team.value
+    ? [{ label: team.value.name, to: `/tim/${team.value.id}` }]
+    : []),
 ]);
 
 const position = computed(
@@ -71,7 +73,9 @@ const showAllMatches = ref(false);
 const showAllTransfers = ref(false);
 const showAllInjuries = ref(false);
 const matchPreview = computed(() =>
-  showAllMatches.value ? matchLog.value : matchLog.value.slice(0, MATCH_PREVIEW),
+  showAllMatches.value
+    ? matchLog.value
+    : matchLog.value.slice(0, MATCH_PREVIEW),
 );
 const transferPreview = computed(() =>
   showAllTransfers.value
@@ -118,7 +122,9 @@ const followed = ref(false);
         </p>
         <MetaLine label="Usia">
           <span class="tabular-nums">{{ age }}</span>
-          <template v-if="player?.birthDate"> ({{ player.birthDate }})</template>
+          <template v-if="player?.birthDate">
+            ({{ player.birthDate }})</template
+          >
         </MetaLine>
         <MetaLine v-if="player?.marketValue" label="Nilai pasar">
           {{ player.marketValue }}

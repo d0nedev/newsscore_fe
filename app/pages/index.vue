@@ -45,7 +45,9 @@ const leagueName = (id: string) => findLeague(id)?.name ?? "";
     <SectionCard
       title="Pertandingan Hari Ini"
       :empty="
-        shownMatches.length ? undefined : 'Tidak ada pertandingan pada filter ini.'
+        shownMatches.length
+          ? undefined
+          : 'Tidak ada pertandingan pada filter ini.'
       "
     >
       <template #action>
@@ -70,7 +72,12 @@ const leagueName = (id: string) => findLeague(id)?.name ?? "";
       </ul>
 
       <div class="border-t p-2 text-center">
-        <Button as-child variant="ghost" size="sm" class="gap-2 text-xs font-semibold">
+        <Button
+          as-child
+          variant="ghost"
+          size="sm"
+          class="gap-2 text-xs font-semibold"
+        >
           <NuxtLink :to="`/sepak-bola/${leagues[0]!.id}`">
             <CalendarDays /> Lihat Jadwal Lengkap
           </NuxtLink>

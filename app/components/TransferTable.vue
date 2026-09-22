@@ -16,7 +16,10 @@ defineProps<{ transfers: TeamTransfer[] }>();
       </TableRow>
     </TableHeader>
     <TableBody>
-      <TableRow v-for="transfer in transfers" :key="transfer.date + transfer.player">
+      <TableRow
+        v-for="transfer in transfers"
+        :key="transfer.date + transfer.player"
+      >
         <TableCell class="text-muted-foreground pl-4 tabular-nums">
           {{ transfer.date }}
         </TableCell>

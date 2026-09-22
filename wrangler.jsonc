@@ -5,6 +5,6 @@
   // Static SPA: `nuxt generate` writes .output/public, no Worker script needed.
   "assets": {
     "directory": "./.output/public",
-    "not_found_handling": "single-page-application"
-  }
+    "not_found_handling": "single-page-application",
+  },
 }

@@ -46,9 +46,7 @@ function onKeydown(event: KeyboardEvent, index: number) {
   const target = props.items[next];
   if (!target) return;
   emit("update:modelValue", target);
-  const list = (event.currentTarget as HTMLElement).closest(
-    "[data-pill-tabs]",
-  );
+  const list = (event.currentTarget as HTMLElement).closest("[data-pill-tabs]");
   const buttons = list?.querySelectorAll<HTMLButtonElement>("button");
   buttons?.[next]?.focus();
 }

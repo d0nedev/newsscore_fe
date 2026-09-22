@@ -17,7 +17,10 @@ defineProps<{ transfers: PlayerProfile["transfers"] }>();
       </TableRow>
     </TableHeader>
     <TableBody>
-      <TableRow v-for="transfer in transfers" :key="transfer.season + transfer.to">
+      <TableRow
+        v-for="transfer in transfers"
+        :key="transfer.season + transfer.to"
+      >
         <TableCell class="text-muted-foreground pl-4 tabular-nums">
           {{ transfer.date ?? transfer.season }}
         </TableCell>

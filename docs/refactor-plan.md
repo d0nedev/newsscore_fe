@@ -5,26 +5,26 @@ Dasar: pemindaian repo pada 2026-09-21, diperbarui 2026-09-22.
 Warna sengaja tidak disentuh di sini — lihat `docs/color-recommendation.md`.
 Rencana API terpisah di `docs/integration-api-plan.md`.
 
-| Bagian | Isi | Status |
-| --- | --- | --- |
-| P0 | Lint gagal | **selesai** 2026-09-22 |
-| P1 | Status bintang tidak nyata | belum |
-| P2 | Kode mati | belum, sebagian dibatalkan |
-| P3 | Lapisan data terkunci ke halaman | ditunda, sengaja |
-| P4 | Berkas yang mulai kebesaran | belum |
-| P5 | Logika tanpa pengaman | **selesai** 2026-09-22 |
+| Bagian | Isi                              | Status                     |
+| ------ | -------------------------------- | -------------------------- |
+| P0     | Lint gagal                       | **selesai** 2026-09-22     |
+| P1     | Status bintang tidak nyata       | belum                      |
+| P2     | Kode mati                        | belum, sebagian dibatalkan |
+| P3     | Lapisan data terkunci ke halaman | ditunda, sengaja           |
+| P4     | Berkas yang mulai kebesaran      | belum                      |
+| P5     | Logika tanpa pengaman            | **selesai** 2026-09-22     |
 
 ## Ringkasan kesehatan saat ini
 
 Seluruhnya hijau per 2026-09-22.
 
-| Pemeriksaan | Perintah | Hasil |
-| --- | --- | --- |
-| Build | `pnpm build` | lolos (exit 0) |
-| Type | `pnpm typecheck` | lolos (exit 0) |
-| Lint | `pnpm lint` | lolos (exit 0) |
-| Unit test | `pnpm test` | 32 test, 3 berkas, lolos |
-| E2E | `pnpm test:e2e` | 8 test, lolos |
+| Pemeriksaan | Perintah         | Hasil                    |
+| ----------- | ---------------- | ------------------------ |
+| Build       | `pnpm build`     | lolos (exit 0)           |
+| Type        | `pnpm typecheck` | lolos (exit 0)           |
+| Lint        | `pnpm lint`      | lolos (exit 0)           |
+| Unit test   | `pnpm test`      | 32 test, 3 berkas, lolos |
+| E2E         | `pnpm test:e2e`  | 8 test, lolos            |
 
 Total kode aplikasi di luar `app/components/ui`: 5.115 baris.
 Dari jumlah itu, 1.357 baris (27%) adalah data dummy yang ditulis tangan.
@@ -61,14 +61,14 @@ pindah halaman.
 
 Lima tempat menyimpan salinannya masing-masing:
 
-| Berkas | Baris | Menyimpan |
-| --- | --- | --- |
-| `app/components/MatchList.vue` | 16 | bintang kompetisi |
-| `app/components/MatchRow.vue` | 11 | bintang pertandingan |
-| `app/components/MatchCardRow.vue` | 7 | bintang pertandingan |
-| `app/pages/pertandingan/[match].vue` | 60 | bintang dua tim |
-| `app/pages/tim/[team].vue` | 73 | ikuti tim |
-| `app/pages/pemain/[player].vue` | 87 | ikuti pemain |
+| Berkas                               | Baris | Menyimpan            |
+| ------------------------------------ | ----- | -------------------- |
+| `app/components/MatchList.vue`       | 16    | bintang kompetisi    |
+| `app/components/MatchRow.vue`        | 11    | bintang pertandingan |
+| `app/components/MatchCardRow.vue`    | 7     | bintang pertandingan |
+| `app/pages/pertandingan/[match].vue` | 60    | bintang dua tim      |
+| `app/pages/tim/[team].vue`           | 73    | ikuti tim            |
+| `app/pages/pemain/[player].vue`      | 87    | ikuti pemain         |
 
 Akibat yang terlihat pengguna: membintangi pertandingan di beranda tidak
 tampak di halaman liga; membintangi tim di halamannya tidak mengisi daftar
@@ -84,12 +84,12 @@ Saya" lalu diturunkan dari sana, bukan dari array statis.
 Hapus, jangan disambungkan. Tidak ada yang memanggilnya dan tidak ada rencana
 konkret yang membutuhkannya.
 
-| Berkas | Bukti |
-| --- | --- |
-| `app/services/api-client.ts` | nol referensi di luar dirinya sendiri |
-| `app/plugins/vue-query.ts` | nol referensi; plugin aktif tetapi tak terpakai |
-| `app/components/ErrorState.vue` | nol referensi |
-| `app/components/ui/toggle/` | hanya dirujuk berkasnya sendiri |
+| Berkas                          | Bukti                                           |
+| ------------------------------- | ----------------------------------------------- |
+| `app/services/api-client.ts`    | nol referensi di luar dirinya sendiri           |
+| `app/plugins/vue-query.ts`      | nol referensi; plugin aktif tetapi tak terpakai |
+| `app/components/ErrorState.vue` | nol referensi                                   |
+| `app/components/ui/toggle/`     | hanya dirujuk berkasnya sendiri                 |
 
 Catatan: `app/utils/api-error.ts` **tetap dipakai** oleh `ErrorState.vue` dan
 punya test sendiri. Jika `ErrorState.vue` dihapus, `api-error.ts` ikut menjadi
@@ -134,13 +134,13 @@ Rencana bertahap, tanpa abstraksi spekulatif:
 
 ## P4 — Berkas yang mulai kebesaran
 
-| Berkas | Baris | Catatan |
-| --- | --- | --- |
-| `app/data/teams.ts` | 629 | data dummy; besar itu wajar, tetapi profil pemain lengkap sebaiknya dipisah ke `app/data/players.ts` |
-| `app/data/matches.ts` | 476 | data dummy |
-| `app/pages/pertandingan/[match].vue` | 342 | **bukan data** — seluruh isi tab ditulis inline dalam satu template |
-| `app/layouts/default.vue` | 255 | sidebar, navigasi olahraga, dan footer dalam satu berkas |
-| `app/types/match.ts` | 232 | menampung tipe pertandingan, tim, pemain, liga, dan berita sekaligus |
+| Berkas                               | Baris | Catatan                                                                                              |
+| ------------------------------------ | ----- | ---------------------------------------------------------------------------------------------------- |
+| `app/data/teams.ts`                  | 629   | data dummy; besar itu wajar, tetapi profil pemain lengkap sebaiknya dipisah ke `app/data/players.ts` |
+| `app/data/matches.ts`                | 476   | data dummy                                                                                           |
+| `app/pages/pertandingan/[match].vue` | 342   | **bukan data** — seluruh isi tab ditulis inline dalam satu template                                  |
+| `app/layouts/default.vue`            | 255   | sidebar, navigasi olahraga, dan footer dalam satu berkas                                             |
+| `app/types/match.ts`                 | 232   | menampung tipe pertandingan, tim, pemain, liga, dan berita sekaligus                                 |
 
 Usulan:
 

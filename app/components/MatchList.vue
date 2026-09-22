@@ -49,9 +49,7 @@ const pinned = computed(() => isPinned(props.leagueId));
         class="size-6 shrink-0"
         :class="pinned ? 'text-sky-600' : 'text-muted-foreground'"
         :aria-pressed="pinned"
-        :aria-label="
-          pinned ? `Lepas sematan ${title}` : `Sematkan ${title}`
-        "
+        :aria-label="pinned ? `Lepas sematan ${title}` : `Sematkan ${title}`"
         @click="toggle(leagueId)"
       >
         <Pin :fill="pinned ? 'currentColor' : 'none'" />

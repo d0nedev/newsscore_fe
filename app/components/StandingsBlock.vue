@@ -23,12 +23,7 @@ const rows = computed(() =>
       >
     </div>
 
-    <PillTabs
-      v-model="scope"
-      :items="scopes"
-      fill
-      label="Cakupan klasemen"
-    />
+    <PillTabs v-model="scope" :items="scopes" fill label="Cakupan klasemen" />
 
     <StandingsTable :rows="rows" :total="league.standings.length" />
   </section>

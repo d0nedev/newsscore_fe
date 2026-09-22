@@ -95,7 +95,8 @@ const capacity = new Intl.NumberFormat("id-ID");
 
       <template #meta>
         <MetaLine label="Stadion" class="mt-1">
-          {{ team.venue }}<template v-if="team.city"> ({{ team.city }})</template>
+          {{ team.venue
+          }}<template v-if="team.city"> ({{ team.city }})</template>
         </MetaLine>
         <MetaLine label="Kapasitas">
           <span class="tabular-nums">{{ capacity.format(team.capacity) }}</span>
