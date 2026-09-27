@@ -84,7 +84,12 @@ const capacity = new Intl.NumberFormat("id-ID");
   />
 
   <div v-else-if="team" class="space-y-4">
-    <PageHeader :crumbs="crumbs" :title="team.name" icon="shield">
+    <PageHeader
+      :crumbs="crumbs"
+      :title="team.name"
+      icon="shield"
+      :logo="team.logo"
+    >
       <template #actions>
         <Button
           variant="ghost"

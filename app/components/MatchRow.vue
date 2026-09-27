@@ -10,9 +10,9 @@ const props = defineProps<{
 
 const starred = ref(false);
 
-// "Selesai" / minute for live / kick-off time for fixtures.
-const status = computed(() =>
-  props.match.status === "finished" ? "Selesai" : props.match.time,
+// Live shows its marker; everything else shows play date and kick-off time.
+const day = computed(() =>
+  props.match.status === "live" ? null : props.match.date.slice(0, 5),
 );
 
 const winner = computed(() => {
@@ -69,17 +69,18 @@ const outcome = computed(() => {
             : 'text-muted-foreground'
         "
       >
-        {{ status }}
+        <span v-if="day" class="block tabular-nums">{{ day }}</span>
+        <span class="block tabular-nums">{{ match.time }}</span>
       </span>
 
       <span class="min-w-0 flex-1 space-y-1">
         <span
           v-for="side in ['home', 'away'] as const"
           :key="side"
-          class="flex items-center gap-2"
-          :class="winner === side || !winner ? 'font-semibold' : ''"
+          class="flex items-center gap-2 font-medium"
+          :class="winner && winner !== side ? 'text-muted-foreground' : ''"
         >
-          <TeamBadge :badge="match[side].badge" />
+          <TeamBadge :badge="match[side].badge" :logo="match[side].logo" />
           <span class="truncate">{{ match[side].name }}</span>
         </span>
       </span>

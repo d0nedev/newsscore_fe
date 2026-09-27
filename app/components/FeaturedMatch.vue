@@ -31,7 +31,15 @@ const goals = (side: "home" | "away") =>
         class="text-center"
         :class="side === 'home' ? 'order-1' : 'order-3'"
       >
+        <img
+          v-if="match[side].logo"
+          :src="match[side].logo"
+          alt=""
+          aria-hidden="true"
+          class="mx-auto mb-2 size-12 object-contain"
+        />
         <span
+          v-else
           class="mx-auto mb-2 grid size-12 place-items-center rounded-full bg-white/10 text-base font-bold"
           aria-hidden="true"
           >{{ match[side].badge }}</span

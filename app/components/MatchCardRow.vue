@@ -30,8 +30,8 @@ const label = computed(() => {
       class="grid min-w-0 flex-1 grid-cols-[1fr_auto_1fr] items-center gap-3"
     >
       <span class="flex min-w-0 items-center justify-end gap-2 text-right">
-        <span class="truncate font-semibold">{{ match.home.name }}</span>
-        <TeamBadge :badge="match.home.badge" />
+        <span class="truncate font-medium">{{ match.home.name }}</span>
+        <TeamBadge :badge="match.home.badge" :logo="match.home.logo" />
       </span>
 
       <span
@@ -45,8 +45,8 @@ const label = computed(() => {
       </span>
 
       <span class="flex min-w-0 items-center gap-2">
-        <TeamBadge :badge="match.away.badge" />
-        <span class="truncate font-semibold">{{ match.away.name }}</span>
+        <TeamBadge :badge="match.away.badge" :logo="match.away.logo" />
+        <span class="truncate font-medium">{{ match.away.name }}</span>
       </span>
     </NuxtLink>
 

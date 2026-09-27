@@ -93,6 +93,8 @@ interface ApiTeamProfile extends Team {
 interface ApiPlayerProfile {
   id: string;
   name: string;
+  /** Local path, 108x108. */
+  photo?: string;
   number?: number;
   position?: string;
   country?: string;
@@ -124,8 +126,15 @@ interface ApiPlayerProfile {
 
 // ---------- mapping ----------
 
+const withLogo = <T extends { logo?: string }>(item: T): T => ({
+  ...item,
+  logo: assetUrl(item.logo),
+});
+
 const toMatch = ({ league: _league, ...m }: ApiMatch): Match => ({
   ...m,
+  home: withLogo(m.home),
+  away: withLogo(m.away),
   round: "",
   venue: "",
   events: [],
@@ -174,7 +183,7 @@ const toLeague = (l: ApiLeague): League => ({
   country: l.country,
   type: l.type,
   season: l.season ? String(l.season) : "",
-  standings: l.standings ?? [],
+  standings: (l.standings ?? []).map(withLogo),
   archive: [],
 });
 
@@ -182,6 +191,7 @@ const toTeam = (t: ApiTeamProfile): TeamProfile => ({
   id: t.id,
   name: t.name,
   badge: t.badge,
+  logo: assetUrl(t.logo),
   // The profile names no league; its matches do.
   leagueId:
     t.recentMatches[0]?.leagueId ?? t.upcomingMatches[0]?.leagueId ?? "",
@@ -200,7 +210,8 @@ const toTeam = (t: ApiTeamProfile): TeamProfile => ({
 const toPlayer = (p: ApiPlayerProfile): PlayerProfile => ({
   id: p.id,
   name: p.name,
-  team: p.team ?? undefined,
+  team: p.team ? withLogo(p.team) : undefined,
+  photo: assetUrl(p.photo),
   number: p.number,
   position: p.position === "GK" ? "Penjaga gawang" : p.position,
   country: p.country,

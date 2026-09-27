@@ -104,7 +104,7 @@ const starred = ref({ home: false, away: false });
             class="flex flex-col items-center gap-2 text-center hover:underline"
             :class="side === 'home' ? 'order-2' : 'order-1'"
           >
-            <CrestBox :initials="match[side].badge" />
+            <CrestBox :initials="match[side].badge" :logo="match[side].logo" />
             <span class="font-bold">{{ match[side].name }}</span>
           </NuxtLink>
         </div>

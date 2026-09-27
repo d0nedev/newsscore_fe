@@ -6,6 +6,7 @@ defineProps<{
   title: string;
   icon?: "trophy" | "shield" | "user";
   initials?: string;
+  logo?: string;
 }>();
 </script>
 
@@ -14,7 +15,7 @@ defineProps<{
     <AppBreadcrumb :items="crumbs" />
 
     <div class="flex items-start gap-4 p-4">
-      <CrestBox :icon="icon" :initials="initials" />
+      <CrestBox :icon="icon" :initials="initials" :logo="logo" />
 
       <div class="min-w-0 flex-1">
         <div class="flex items-center gap-2">

@@ -66,7 +66,10 @@ const legendItems = [
                 :to="`/tim/${row.teamId}`"
                 class="hover:text-primary flex min-w-0 items-center gap-2"
               >
-                <TeamBadge :badge="row.team.slice(0, 2).toUpperCase()" />
+                <TeamBadge
+                  :badge="row.badge ?? row.team.slice(0, 2).toUpperCase()"
+                  :logo="row.logo"
+                />
                 <span class="truncate">{{ row.team }}</span>
               </NuxtLink>
             </TableCell>

@@ -81,7 +81,12 @@ const followed = ref(false);
   />
 
   <div v-else-if="name" class="space-y-4">
-    <PageHeader :crumbs="crumbs" :title="name" icon="user">
+    <PageHeader
+      :crumbs="crumbs"
+      :title="name"
+      icon="user"
+      :logo="player?.photo"
+    >
       <template #actions>
         <Button
           variant="ghost"
@@ -125,6 +130,7 @@ const followed = ref(false);
           v-if="team"
           :to="`/tim/${team.id}`"
           :label="team.name"
+          :logo="team.logo"
           icon="shield"
           class="hidden sm:grid"
         />

@@ -5,6 +5,8 @@ export interface Team {
   name: string;
   /** Short code used as a text stand-in for the club crest. */
   badge: string;
+  /** Crest image URL; badge is the fallback. */
+  logo?: string;
 }
 
 export interface MatchEvent {
@@ -88,6 +90,8 @@ export interface StandingRow {
   position: number;
   teamId: string;
   team: string;
+  badge?: string;
+  logo?: string;
   played: number;
   won: number;
   drawn: number;
@@ -198,6 +202,8 @@ export interface CareerRow {
 export interface PlayerProfile {
   id: string;
   name: string;
+  /** Portrait URL; the header falls back to a silhouette. */
+  photo?: string;
   team?: Team;
   position?: string;
   number?: number;
