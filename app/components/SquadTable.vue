@@ -18,7 +18,7 @@ const label = {
   DF: "Bek",
   MF: "Gelandang",
   FW: "Penyerang",
-  // The API only tells goalkeepers apart.
+  // Players the source has no position for.
   other: "Pemain",
 };
 </script>

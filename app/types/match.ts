@@ -122,7 +122,7 @@ export interface SquadPlayer {
   id: string;
   name: string;
   number?: number;
-  /** The API only knows goalkeepers; everyone else is undefined. */
+  /** Undefined when the source has no position for the player. */
   position?: "GK" | "DF" | "MF" | "FW";
   age?: number;
   matches: number;

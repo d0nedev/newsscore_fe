@@ -83,7 +83,7 @@ function team(id: string) {
       id: p.id,
       name: p.name,
       number: p.number,
-      position: p.position === "GK" ? "GK" : undefined,
+      position: p.position,
       matches: p.matches,
       goals: p.goals,
       assists: p.assists,
@@ -105,7 +105,8 @@ function player(id: string) {
       id: profile.id,
       name: profile.name,
       number: profile.number,
-      position: profile.goalkeeper ? "GK" : undefined,
+      position: teams.flatMap((x) => x.squad).find((x) => x.id === profile.id)
+        ?.position,
       country: profile.country,
       team: { id: t.id, name: t.name, badge: t.badge },
       season: { season: 2026, ...profile.season },
@@ -132,6 +133,7 @@ function player(id: string) {
       id: entry.id,
       name: entry.name,
       number: entry.number,
+      position: entry.position,
       team: { id: t.id, name: t.name, badge: t.badge },
       season: {
         season: 2026,

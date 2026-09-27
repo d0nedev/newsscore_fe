@@ -188,6 +188,15 @@ const toLeague = (l: ApiLeague): League => ({
   archive: [],
 });
 
+const POSITIONS = {
+  GK: "Penjaga gawang",
+  DF: "Bek",
+  MF: "Gelandang",
+  FW: "Penyerang",
+} as const;
+type Position = keyof typeof POSITIONS;
+const isPosition = (p?: string): p is Position => !!p && p in POSITIONS;
+
 const toTeam = (t: ApiTeamProfile): TeamProfile => ({
   id: t.id,
   name: t.name,
@@ -200,7 +209,7 @@ const toTeam = (t: ApiTeamProfile): TeamProfile => ({
     id: p.id,
     name: p.name,
     number: p.number,
-    position: p.position === "GK" ? "GK" : undefined,
+    position: isPosition(p.position) ? p.position : undefined,
     matches: p.matches,
     goals: p.goals,
     assists: p.assists,
@@ -214,7 +223,7 @@ const toPlayer = (p: ApiPlayerProfile): PlayerProfile => ({
   team: p.team ? withLogo(p.team) : undefined,
   photo: assetUrl(p.photo),
   number: p.number,
-  position: p.position === "GK" ? "Penjaga gawang" : p.position,
+  position: isPosition(p.position) ? POSITIONS[p.position] : p.position,
   country: p.country,
   goalkeeper: p.position === "GK",
   season: {
