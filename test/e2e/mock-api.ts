@@ -167,11 +167,18 @@ async function handle(route: Route) {
         ? json(route, 200, { data: toApiMatchDetail(match) })
         : notFound(route);
     }
+    // "DD.MM.YYYY" -> "YYYYMMDD", so dates compare as strings.
+    const key = (d: string) => d.split(".").reverse().join("");
+    const from = q.get("from"),
+      to = q.get("to");
     const date = q.get("date") ?? "20.09.2026";
+    const onDay = (d: string) =>
+      from && to ? key(d) >= key(from) && key(d) <= key(to) : d === date;
     const data = matches
       .filter(
         (m) =>
-          m.date === date &&
+          onDay(m.date) &&
+          (!q.get("leagueId") || m.leagueId === q.get("leagueId")) &&
           (!q.get("status") || m.status === q.get("status")) &&
           (!q.get("teamId") ||
             m.home.id === q.get("teamId") ||

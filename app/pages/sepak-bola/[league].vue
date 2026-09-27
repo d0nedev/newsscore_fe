@@ -21,10 +21,11 @@ const crumbs = computed(() => [
   },
 ]);
 
-const week = useMatchWeek();
-const all = computed(() =>
-  week.value.data.filter((match) => match.leagueId === league.value?.id),
-);
+const matchesQuery = useMatches(() => ({
+  leagueId: String(route.params.league),
+  ...matchWindow(),
+}));
+const all = computed(() => matchesQuery.data.value ?? []);
 const results = computed(() =>
   all.value.filter((match) => match.status !== "scheduled"),
 );

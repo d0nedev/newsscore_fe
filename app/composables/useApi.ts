@@ -35,6 +35,7 @@ interface ApiMatch {
   /** Competition slug. */
   leagueId: string;
   league: string;
+  round?: string;
   status: MatchStatus;
   time: string;
   date: string;
@@ -135,7 +136,7 @@ const toMatch = ({ league: _league, ...m }: ApiMatch): Match => ({
   ...m,
   home: withLogo(m.home),
   away: withLogo(m.away),
-  round: "",
+  round: m.round ?? "",
   venue: "",
   events: [],
   stats: [],
@@ -260,6 +261,12 @@ export function useMatchDays() {
   };
 }
 
+/** Last and next 15 days: the widest range /matches accepts (31 days). */
+export function matchWindow() {
+  const now = Date.now();
+  return { from: formatDate(now - 15 * DAY), to: formatDate(now + 15 * DAY) };
+}
+
 // ---------- hooks ----------
 
 /** Every competition, without tables (GET /leagues). */
@@ -324,6 +331,10 @@ export function useLeagueTables() {
 
 export interface MatchFilter {
   date?: string;
+  /** "DD.MM.YYYY" range, at most 31 days; replaces date. */
+  from?: string;
+  to?: string;
+  leagueId?: string;
   teamId?: string;
   status?: MatchStatus;
 }
@@ -341,25 +352,6 @@ export function useMatches(
     enabled,
     refetchInterval: (query) =>
       query.state.data?.some((m) => m.status === "live") ? 30_000 : false,
-  });
-}
-
-// ponytail: /matches is per day only, so league and country pages show the
-// seven-day window (7 requests, shared cache with the home page). Add a date
-// range or leagueId filter to the API when a full season view is needed.
-export function useMatchWeek() {
-  const { matchDates } = useMatchDays();
-  return useQueries({
-    queries: matchDates.map((date) => ({
-      queryKey: ["matches", { date }],
-      queryFn: () =>
-        get<ApiMatch[]>("/matches", { date }).then((list) => list.map(toMatch)),
-    })),
-    combine: (results) => ({
-      data: results.flatMap((r) => r.data ?? []),
-      error: results.find((r) => r.error)?.error ?? null,
-      isPending: results.some((r) => r.isPending),
-    }),
   });
 }
 

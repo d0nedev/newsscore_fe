@@ -12,7 +12,7 @@ const crumbs = computed(() => [
 const views = ["Skor terkini", "Jadwal"] as const;
 const view = ref<string>(views[0]);
 
-const matchesQuery = useMatchWeek();
+const matchesQuery = useMatches(matchWindow());
 
 // One block per competition in this country, each keeping its own header bar.
 const blocks = computed(() => {
@@ -20,7 +20,7 @@ const blocks = computed(() => {
   return comps
     .byCountry(country.value)
     .map((competition) => {
-      const all = matchesQuery.value.data.filter(
+      const all = (matchesQuery.data.value ?? []).filter(
         (match) => match.leagueId === competition.id,
       );
       const matches =
