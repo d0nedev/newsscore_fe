@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { competitionsByCountry, findCountry } from "~/data/leagues";
-import { matchesByLeague } from "~/data/matches";
-
 const route = useRoute();
-const country = computed(() => findCountry(String(route.params.country)));
+const comps = useCompetitions();
+const country = computed(() => comps.findCountry(String(route.params.country)));
 useHead(() => ({ title: country.value ?? "Negara tidak ditemukan" }));
 
 const crumbs = computed(() => [
@@ -14,12 +12,17 @@ const crumbs = computed(() => [
 const views = ["Skor terkini", "Jadwal"] as const;
 const view = ref<string>(views[0]);
 
+const matchesQuery = useMatchWeek();
+
 // One block per competition in this country, each keeping its own header bar.
 const blocks = computed(() => {
   if (!country.value) return [];
-  return competitionsByCountry(country.value)
+  return comps
+    .byCountry(country.value)
     .map((competition) => {
-      const all = matchesByLeague(competition.id);
+      const all = matchesQuery.value.data.filter(
+        (match) => match.leagueId === competition.id,
+      );
       const matches =
         view.value === "Jadwal"
           ? all.filter((match) => match.status === "scheduled")
@@ -39,9 +42,17 @@ const empty = computed(() =>
 </script>
 
 <template>
-  <NotFoundCard v-if="!country" message="Negara tidak ditemukan." />
+  <ErrorState
+    v-if="comps.error.value"
+    :error="comps.error.value"
+    @retry="comps.refetch()"
+  />
+  <NotFoundCard
+    v-else-if="comps.isSuccess.value && !country"
+    message="Negara tidak ditemukan."
+  />
 
-  <div v-else class="space-y-4">
+  <div v-else-if="country" class="space-y-4">
     <Card class="gap-0 overflow-hidden py-0">
       <AppBreadcrumb :items="crumbs" />
 
@@ -58,7 +69,7 @@ const empty = computed(() =>
         :subtitle="block.competition.country"
         :league-id="block.competition.id"
         :link-label="
-          block.competition.standings.length ? 'Klasemen' : 'Penarikan'
+          block.competition.type === 'league' ? 'Klasemen' : 'Penarikan'
         "
         :matches="block.matches"
       />

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { Star, Tv } from "@lucide/vue";
-import { findLeague } from "~/data/leagues";
-import { findMatch } from "~/data/matches";
-import { news } from "~/data/news";
 import { slugify } from "~/utils/slug";
 
 const route = useRoute();
-const match = computed(() => findMatch(String(route.params.match)));
+const matchQuery = useMatch(() => String(route.params.match));
+const match = computed(() => matchQuery.data.value);
+const { findLeague } = useCompetitions();
+const { data: news } = useNews(() => ({ matchId: String(route.params.match) }));
 useHead(() => ({
   title: match.value
     ? `${match.value.home.name} - ${match.value.away.name}`
@@ -20,7 +20,7 @@ const league = computed(() =>
 // Top row picks the area of the match; the pill row picks the detail below it.
 const mainTabs = computed(() => [
   "Pertandingan",
-  "H2H",
+  ...(match.value?.headToHead.length ? ["H2H"] : []),
   ...(match.value?.odds?.length ? ["Peluang"] : []),
   "Berita",
 ]);
@@ -61,9 +61,17 @@ const starred = ref({ home: false, away: false });
 </script>
 
 <template>
-  <NotFoundCard v-if="!match" message="Pertandingan tidak ditemukan." />
+  <ErrorState
+    v-if="matchQuery.error.value && !isNotFound(matchQuery.error.value)"
+    :error="matchQuery.error.value"
+    @retry="matchQuery.refetch()"
+  />
+  <NotFoundCard
+    v-else-if="matchQuery.error.value"
+    message="Pertandingan tidak ditemukan."
+  />
 
-  <div v-else class="space-y-4">
+  <div v-else-if="match" class="space-y-4">
     <Card class="gap-0 overflow-hidden py-0">
       <AppBreadcrumb :items="crumbs" />
 
@@ -344,6 +352,6 @@ const starred = ref({ home: false, away: false });
       </template>
     </Card>
 
-    <NewsList v-if="mainTab === 'Berita'" :items="news" />
+    <NewsList v-if="mainTab === 'Berita'" :items="news ?? []" />
   </div>
 </template>

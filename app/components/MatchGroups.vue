@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { findLeague } from "~/data/leagues";
 import type { Match } from "~/types/match";
 
 const props = defineProps<{
@@ -9,6 +8,8 @@ const props = defineProps<{
 
 // Competition blocks appear in the order their first match does, so the list
 // reads chronologically even when a team switches between league and cup.
+const { findLeague } = useCompetitions();
+
 const groups = computed(() => {
   const byLeague = new Map<string, Match[]>();
   for (const match of props.matches) {
@@ -23,7 +24,7 @@ const groups = computed(() => {
       matches,
       name: league?.name ?? leagueId,
       country: league?.country ?? "Dunia",
-      hasStandings: (league?.standings.length ?? 0) > 0,
+      hasStandings: league?.type === "league",
     };
   });
 });

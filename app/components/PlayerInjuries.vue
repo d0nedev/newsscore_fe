@@ -2,7 +2,7 @@
 import { Cross } from "@lucide/vue";
 import type { PlayerProfile } from "~/types/match";
 
-defineProps<{ injuries: PlayerProfile["injuries"] }>();
+defineProps<{ injuries: NonNullable<PlayerProfile["injuries"]> }>();
 </script>
 
 <template>

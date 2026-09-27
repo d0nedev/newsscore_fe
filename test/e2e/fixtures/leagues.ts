@@ -1,5 +1,5 @@
-import type { League } from "~/types/match";
-import { slugify } from "~/utils/slug";
+import type { League } from "../../../app/types/match";
+import { slugify } from "../../../app/utils/slug";
 
 const form = (s: string) => [...s] as ("W" | "D" | "L")[];
 

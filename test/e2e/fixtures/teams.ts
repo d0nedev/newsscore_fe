@@ -1,4 +1,8 @@
-import type { PlayerProfile, SquadPlayer, TeamProfile } from "~/types/match";
+import type {
+  PlayerProfile,
+  SquadPlayer,
+  TeamProfile,
+} from "../../../app/types/match";
 
 const squad = (prefix: string, names: string[]): SquadPlayer[] =>
   names.map((name, i) => ({

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ChevronLeft, ChevronRight } from "@lucide/vue";
-import { matchDates, today } from "~/data/matches";
 
 const model = defineModel<string>({ required: true });
+
+const { matchDates, today } = useMatchDays();
 
 const index = computed(() => matchDates.indexOf(model.value));
 

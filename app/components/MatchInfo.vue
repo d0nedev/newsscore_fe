@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { Building2, Flag, Users, Whistle } from "@lucide/vue";
 import type { Match } from "~/types/match";
-import { findTeam } from "~/data/teams";
 
 const props = defineProps<{ match: Match }>();
 
-const home = computed(() => findTeam(props.match.home.id));
 const number = new Intl.NumberFormat("id-ID");
 
 const rows = computed(() =>
@@ -15,7 +13,9 @@ const rows = computed(() =>
     {
       icon: Flag,
       label: "Kapasitas",
-      value: home.value ? number.format(home.value.capacity) : undefined,
+      value: props.match.capacity
+        ? number.format(props.match.capacity)
+        : undefined,
     },
     {
       icon: Users,

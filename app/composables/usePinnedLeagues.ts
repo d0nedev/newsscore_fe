@@ -1,13 +1,14 @@
-import { competitions, leagues } from "~/data/leagues";
+import { useLocalStorage } from "@vueuse/core";
 
 /**
  * Which competitions the reader has pinned. One shared list, so a league's pin
  * looks the same in every section header, on its own page and in the sidebar.
+ * Kept in this browser only; the API has no pin endpoint.
  */
 export function usePinnedLeagues() {
-  const pinned = useState<string[]>("pinned-leagues", () => [
-    leagues[0]?.id ?? "",
-  ]);
+  // Same key everywhere, so every caller shares one reactive list.
+  const pinned = useLocalStorage<string[]>("pinned-leagues", []);
+  const { competitions } = useCompetitions();
 
   const isPinned = (leagueId?: string) =>
     Boolean(leagueId) && pinned.value.includes(leagueId!);
@@ -19,7 +20,7 @@ export function usePinnedLeagues() {
   };
 
   const pinnedLeagues = computed(() =>
-    competitions.filter((competition) => pinned.value.includes(competition.id)),
+    competitions.value.filter((c) => pinned.value.includes(c.id)),
   );
 
   return { pinned, pinnedLeagues, isPinned, toggle };

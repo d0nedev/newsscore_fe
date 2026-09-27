@@ -9,6 +9,8 @@ export interface Team {
 
 export interface MatchEvent {
   minute: number;
+  /** As the source wrote it, e.g. "45+2'". */
+  minuteLabel?: string;
   team: "home" | "away";
   type: "goal" | "yellow" | "red" | "sub";
   player: string;
@@ -76,6 +78,8 @@ export interface Match {
   commentary?: CommentaryLine[];
   playerStats?: PlayerMatchStat[];
   referee?: string;
+  /** Home venue capacity, only on the match detail response. */
+  capacity?: number;
   attendance?: number;
   broadcasters?: string[];
 }
@@ -113,9 +117,10 @@ export interface League {
 export interface SquadPlayer {
   id: string;
   name: string;
-  number: number;
-  position: "GK" | "DF" | "MF" | "FW";
-  age: number;
+  number?: number;
+  /** The API only knows goalkeepers; everyone else is undefined. */
+  position?: "GK" | "DF" | "MF" | "FW";
+  age?: number;
   matches: number;
   goals: number;
   assists: number;
@@ -135,13 +140,15 @@ export interface TeamTransfer {
 
 export interface TeamProfile extends Team {
   leagueId: string;
-  venue: string;
-  capacity: number;
-  founded: number;
+  venue?: string;
+  capacity?: number;
+  founded?: number;
   /** City shown next to the stadium name in the team header. */
   city?: string;
   squad: SquadPlayer[];
   transfers?: TeamTransfer[];
+  /** Last 5 and next 5 matches. */
+  matches?: Match[];
 }
 
 export interface PlayerMatchLogEntry {
@@ -191,22 +198,22 @@ export interface CareerRow {
 export interface PlayerProfile {
   id: string;
   name: string;
-  teamId: string;
-  position: string;
-  number: number;
-  age: number;
-  country: string;
-  height: number;
-  foot: "Kiri" | "Kanan";
+  team?: Team;
+  position?: string;
+  number?: number;
+  age?: number;
+  country?: string;
+  height?: number;
+  foot?: "Kiri" | "Kanan";
   /** "DD.MM.YYYY", shown next to the age in the header. */
   birthDate?: string;
   marketValue?: string;
   contractUntil?: string;
   goalkeeper?: boolean;
-  season: { matches: number; goals: number; assists: number; minutes: number };
+  season: { matches: number; goals: number; assists: number; minutes?: number };
   matchLog?: PlayerMatchLogEntry[];
   career?: CareerRow[];
-  transfers: {
+  transfers?: {
     season: string;
     /** "DD.MM.YYYY"; falls back to the season label when absent. */
     date?: string;
@@ -216,7 +223,7 @@ export interface PlayerProfile {
     type?: string;
     fee: string;
   }[];
-  injuries: { season: string; issue: string; from: string; to: string }[];
+  injuries?: { season: string; issue: string; from: string; to: string }[];
 }
 
 export interface NewsItem {

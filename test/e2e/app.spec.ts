@@ -1,5 +1,5 @@
 import type { Page } from "@playwright/test";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./mock-api";
 
 const matchList = (page: Page) =>
   page.getByRole("list", { name: "Pertandingan hari ini" });
@@ -57,38 +57,9 @@ test("match detail switches between tabs", async ({ page }) => {
   await page.getByRole("tab", { name: "Susunan Pemain" }).click();
   await expect(page.getByRole("link", { name: "M. Flekken" })).toBeVisible();
 
-  await page.getByRole("tab", { name: "H2H" }).click();
-  await expect(page.getByText("Pertemuan terakhir")).toBeVisible();
-
-  await page.getByRole("tab", { name: "Komentar" }).click();
-  await expect(page.getByText("Komentar langsung")).toBeVisible();
-
-  await page.getByRole("tab", { name: "Peluang" }).click();
-  await expect(page.getByRole("cell", { name: "SkorBet" })).toBeVisible();
-
-  await page.getByRole("tab", { name: "Statistik Pemain" }).click();
-  await expect(page.getByRole("cell", { name: "8.4" })).toBeVisible();
-});
-
-test("league and team odds tabs list fixtures", async ({ page }) => {
-  await page.goto("/sepak-bola/liga-primer");
-  await page.getByRole("tab", { name: "Peluang" }).click();
-  await expect(
-    page.getByRole("link", { name: "Liverpool - Newcastle" }),
-  ).toBeVisible();
-
-  await page.goto("/tim/chelsea");
-  await page.getByRole("tab", { name: "Peluang" }).click();
-  await expect(
-    page.getByRole("link", { name: "Brentford - Chelsea" }),
-  ).toBeVisible();
-});
-
-test("league archive lists past seasons", async ({ page }) => {
-  await page.goto("/sepak-bola/liga-primer");
-  await page.getByRole("tab", { name: "Arsip" }).click();
-  await expect(page.getByText("Arsip musim")).toBeVisible();
-  await expect(page.getByRole("cell", { name: "2024/2025" })).toBeVisible();
+  // The API has no head-to-head, odds, commentary or player ratings.
+  await expect(page.getByRole("tab", { name: "H2H" })).toHaveCount(0);
+  await expect(page.getByRole("tab", { name: "Peluang" })).toHaveCount(0);
 });
 
 test("league page shows standings", async ({ page }) => {
@@ -109,14 +80,8 @@ test("team squad links through to a player profile", async ({ page }) => {
   await page.getByRole("link", { name: /C. Palmer/ }).click();
   await expect(page).toHaveURL("/pemain/che-6");
   await expect(
-    page.getByRole("heading", { name: "Transfer", exact: true }),
+    page.getByRole("heading", { name: "C. Palmer", exact: true }),
   ).toBeVisible();
-
-  await page.getByRole("tab", { name: "Cedera" }).click();
-  await expect(
-    page.getByRole("heading", { name: "Sejarah cedera", exact: true }),
-  ).toBeVisible();
-  await expect(page.getByText("Cedera hamstring")).toBeVisible();
 });
 
 test("unknown match shows not found", async ({ page }) => {

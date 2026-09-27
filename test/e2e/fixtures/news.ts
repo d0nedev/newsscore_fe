@@ -1,4 +1,4 @@
-import type { NewsItem } from "~/types/match";
+import type { NewsItem } from "../../../app/types/match";
 
 // Dummy headlines for the static slice; no real reporting behind them.
 export const news: NewsItem[] = [

@@ -1,24 +1,15 @@
 <script setup lang="ts">
 import { Info, Pin, Trophy } from "@lucide/vue";
-import { findLeague } from "~/data/leagues";
-import { matchesByLeague } from "~/data/matches";
 import { slugify } from "~/utils/slug";
 import { seasonProgress } from "~/utils/standings";
 
 const route = useRoute();
-const league = computed(() => findLeague(String(route.params.league)));
+const leagueQuery = useLeague(() => String(route.params.league));
+const league = computed(() => leagueQuery.data.value);
 useHead(() => ({ title: league.value?.name ?? "Kompetisi tidak ditemukan" }));
 
 // Cups have no table, so the standings tab disappears for them.
 const hasStandings = computed(() => (league.value?.standings.length ?? 0) > 0);
-const tabs = computed(() => [
-  "Ringkasan",
-  "Peluang",
-  "Hasil Pertandingan",
-  "Jadwal Pertandingan",
-  ...(hasStandings.value ? ["Klasemen"] : []),
-  "Arsip",
-]);
 const tab = ref("Ringkasan");
 
 const crumbs = computed(() => [
@@ -30,8 +21,9 @@ const crumbs = computed(() => [
   },
 ]);
 
+const week = useMatchWeek();
 const all = computed(() =>
-  league.value ? matchesByLeague(league.value.id) : [],
+  week.value.data.filter((match) => match.leagueId === league.value?.id),
 );
 const results = computed(() =>
   all.value.filter((match) => match.status !== "scheduled"),
@@ -43,6 +35,14 @@ const withOdds = computed(() =>
   all.value.filter((match) => match.odds?.length),
 );
 
+const tabs = computed(() => [
+  "Ringkasan",
+  ...(withOdds.value.length ? ["Peluang"] : []),
+  "Hasil Pertandingan",
+  "Jadwal Pertandingan",
+  ...(hasStandings.value ? ["Klasemen"] : []),
+  ...(league.value?.archive.length ? ["Arsip"] : []),
+]);
 // The summary tab previews each list; the dedicated tabs show everything.
 const PREVIEW = 12;
 const showAllFixtures = ref(false);
@@ -63,9 +63,17 @@ const pinned = computed(() => isPinned(league.value?.id));
 </script>
 
 <template>
-  <NotFoundCard v-if="!league" message="Kompetisi tidak ditemukan." />
+  <ErrorState
+    v-if="leagueQuery.error.value && !isNotFound(leagueQuery.error.value)"
+    :error="leagueQuery.error.value"
+    @retry="leagueQuery.refetch()"
+  />
+  <NotFoundCard
+    v-else-if="leagueQuery.error.value"
+    message="Kompetisi tidak ditemukan."
+  />
 
-  <div v-else class="space-y-4">
+  <div v-else-if="league" class="space-y-4">
     <PageHeader :crumbs="crumbs" :title="league.name" icon="trophy">
       <template #actions>
         <Button
@@ -146,7 +154,7 @@ const pinned = computed(() => isPinned(league.value?.id));
         />
       </SectionCard>
 
-      <StandingsBlock v-if="hasStandings" :league="league" :matches="all" />
+      <StandingsBlock v-if="hasStandings" :league="league" />
     </template>
 
     <SectionCard
@@ -176,7 +184,6 @@ const pinned = computed(() => isPinned(league.value?.id));
     <StandingsBlock
       v-else-if="tab === 'Klasemen' && hasStandings"
       :league="league"
-      :matches="all"
     />
 
     <SectionCard

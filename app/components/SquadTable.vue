@@ -3,11 +3,11 @@ import type { SquadPlayer } from "~/types/match";
 
 const props = defineProps<{ players: SquadPlayer[] }>();
 
-const positions = ["GK", "DF", "MF", "FW"] as const;
+const positions = ["GK", "DF", "MF", "FW", undefined] as const;
 const groups = computed(() =>
   positions
     .map((position) => ({
-      position,
+      position: (position ?? "other") as keyof typeof label,
       players: props.players.filter((player) => player.position === position),
     }))
     .filter((group) => group.players.length > 0),
@@ -18,6 +18,8 @@ const label = {
   DF: "Bek",
   MF: "Gelandang",
   FW: "Penyerang",
+  // The API only tells goalkeepers apart.
+  other: "Pemain",
 };
 </script>
 

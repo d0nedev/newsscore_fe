@@ -1,10 +1,23 @@
 <script setup lang="ts">
 import { Menu, Plus, Pin, Search, Star, User } from "@lucide/vue";
-import { liveCount, sports } from "~/data/matches";
-import { countries, leagues } from "~/data/leagues";
 import { slugify } from "~/utils/slug";
 
 const { pinnedLeagues } = usePinnedLeagues();
+const { leagues, countries } = useCompetitions();
+const sports = [
+  "Sepak Bola",
+  "Tenis",
+  "Bola Basket",
+  "Hoki",
+  "Bisbol",
+  "Kriket",
+  "Esports",
+];
+const { today } = useMatchDays();
+const { data: todayMatches } = useMatches({ date: today });
+const liveCount = computed(
+  () => todayMatches.value?.filter((m) => m.status === "live").length ?? 0,
+);
 const followedTeams = ["Jerman", "Chelsea"];
 const help = [
   "Ketentuan Penggunaan",

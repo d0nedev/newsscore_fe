@@ -2,13 +2,17 @@
 import type { League, Match } from "~/types/match";
 import { standingsByScope, type StandingsScope } from "~/utils/standings";
 
-const props = defineProps<{ league: League; matches: Match[] }>();
+const props = defineProps<{
+  league: League;
+  /** Every played match of the season; without it only the overall table shows. */
+  matches?: Match[];
+}>();
 
 const scopes: StandingsScope[] = ["Keseluruhan", "Kandang", "Tandang"];
 const scope = ref<StandingsScope>("Keseluruhan");
 
 const rows = computed(() =>
-  standingsByScope(props.league.standings, props.matches, scope.value),
+  standingsByScope(props.league.standings, props.matches ?? [], scope.value),
 );
 </script>
 
@@ -23,7 +27,13 @@ const rows = computed(() =>
       >
     </div>
 
-    <PillTabs v-model="scope" :items="scopes" fill label="Cakupan klasemen" />
+    <PillTabs
+      v-if="matches"
+      v-model="scope"
+      :items="scopes"
+      fill
+      label="Cakupan klasemen"
+    />
 
     <StandingsTable :rows="rows" :total="league.standings.length" />
   </section>

@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import { Calendar, CalendarDays } from "@lucide/vue";
-import { findLeague, leagues } from "~/data/leagues";
-import { matches, today } from "~/data/matches";
-import { news } from "~/data/news";
 import type { MatchStatus } from "~/types/match";
 
 useHead({ title: "Skor Langsung" });
@@ -15,11 +12,13 @@ const filters: Record<string, MatchStatus | "all"> = {
 };
 const filterLabel = ref("SEMUA");
 const filter = computed(() => filters[filterLabel.value]!);
-const date = ref(today);
+const date = ref(useMatchDays().today);
 
-const onDate = computed(() =>
-  matches.filter((match) => match.date === date.value),
-);
+const matchesQuery = useMatches(() => ({ date: date.value }));
+const onDate = computed(() => matchesQuery.data.value ?? []);
+const { leagues, findLeague } = useCompetitions();
+const tables = useLeagueTables();
+const { data: news } = useNews();
 const shownMatches = computed(() =>
   onDate.value.filter(
     (match) => filter.value === "all" || match.status === filter.value,
@@ -45,7 +44,7 @@ const leagueName = (id: string) => findLeague(id)?.name ?? "";
     <SectionCard
       title="Pertandingan Hari Ini"
       :empty="
-        shownMatches.length
+        shownMatches.length || matchesQuery.isPending.value
           ? undefined
           : 'Tidak ada pertandingan pada filter ini.'
       "
@@ -65,28 +64,35 @@ const leagueName = (id: string) => findLeague(id)?.name ?? "";
         </DateNav>
       </div>
 
+      <div v-if="matchesQuery.error.value" class="border-t p-3">
+        <ErrorState
+          :error="matchesQuery.error.value"
+          @retry="matchesQuery.refetch()"
+        />
+      </div>
+
       <ul aria-label="Pertandingan hari ini" class="divide-y border-t">
         <li v-for="match in shownMatches" :key="match.id">
           <MatchCardRow :match="match" :league="leagueName(match.leagueId)" />
         </li>
       </ul>
 
-      <div class="border-t p-2 text-center">
+      <div v-if="leagues[0]" class="border-t p-2 text-center">
         <Button
           as-child
           variant="ghost"
           size="sm"
           class="gap-2 text-xs font-semibold"
         >
-          <NuxtLink :to="`/sepak-bola/${leagues[0]!.id}`">
+          <NuxtLink :to="`/sepak-bola/${leagues[0].id}`">
             <CalendarDays /> Lihat Jadwal Lengkap
           </NuxtLink>
         </Button>
       </div>
     </SectionCard>
 
-    <StandingsOverview :leagues="leagues" />
+    <StandingsOverview :leagues="tables" />
 
-    <NewsList :items="news" />
+    <NewsList :items="news ?? []" />
   </div>
 </template>

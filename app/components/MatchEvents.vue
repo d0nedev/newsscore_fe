@@ -55,7 +55,7 @@ const cardColor = (type: MatchEvent["type"]) =>
           :class="event.team === 'away' ? 'flex-row-reverse' : ''"
         >
           <span class="text-muted-foreground w-8 shrink-0 tabular-nums">
-            {{ event.minute }}'
+            {{ event.minuteLabel ?? `${event.minute}'` }}
           </span>
           <Goal v-if="event.type === 'goal'" class="size-4 shrink-0" />
           <ArrowLeftRight

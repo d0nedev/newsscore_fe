@@ -1,35 +1,23 @@
 <script setup lang="ts">
 import { Star } from "@lucide/vue";
-import { countries } from "~/data/leagues";
-import { findPlayer, findTeam, teams } from "~/data/teams";
 import { slugify } from "~/utils/slug";
 
 const route = useRoute();
-const id = computed(() => String(route.params.player));
-
-// Full profiles exist for a few players; the rest fall back to their squad row.
-const player = computed(() => findPlayer(id.value));
-const squadEntry = computed(() =>
-  teams
-    .flatMap((team) => team.squad.map((entry) => ({ team, entry })))
-    .find((row) => row.entry.id === id.value),
-);
-const name = computed(
-  () => player.value?.name ?? squadEntry.value?.entry.name ?? "",
-);
-const team = computed(() =>
-  player.value ? findTeam(player.value.teamId) : squadEntry.value?.team,
-);
-useHead(() => ({ title: name.value || "Pemain tidak ditemukan" }));
+const playerQuery = usePlayer(() => String(route.params.player));
+const player = computed(() => playerQuery.data.value);
+const team = computed(() => player.value?.team);
+const name = computed(() => player.value?.name ?? "");
+const { countries } = useCompetitions();
+useHead(() => ({ title: name.value || "Pemain" }));
 
 const crumbs = computed(() => [
   { label: "Sepak Bola", to: "/" },
-  ...(player.value
+  ...(player.value?.country
     ? [
         {
-          label: player.value.country,
+          label: player.value.country ?? "",
           country: player.value.country,
-          to: countries.includes(player.value.country)
+          to: countries.value.includes(player.value.country ?? "")
             ? `/negara/${slugify(player.value.country)}`
             : undefined,
         },
@@ -40,30 +28,20 @@ const crumbs = computed(() => [
     : []),
 ]);
 
-const position = computed(
-  () => player.value?.position ?? squadEntry.value?.entry.position ?? "",
-);
-const age = computed(() => player.value?.age ?? squadEntry.value?.entry.age);
-const season = computed(() =>
-  player.value
-    ? player.value.season
-    : squadEntry.value && {
-        matches: squadEntry.value.entry.matches,
-        goals: squadEntry.value.entry.goals,
-        assists: squadEntry.value.entry.assists,
-        minutes: squadEntry.value.entry.matches * 90,
-      },
-);
+const position = computed(() => player.value?.position ?? "");
+const age = computed(() => player.value?.age);
+const season = computed(() => player.value?.season);
 
 const matchLog = computed(() => player.value?.matchLog ?? []);
 const career = computed(() => player.value?.career ?? []);
 const transfers = computed(() => player.value?.transfers ?? []);
 const injuries = computed(() => player.value?.injuries ?? []);
 
-// Only full profiles carry a career history, so the extra tabs stay hidden.
-const tabs = computed(() =>
-  player.value ? ["Ringkasan", "Transfer", "Sejarah Cedera"] : ["Ringkasan"],
-);
+const tabs = computed(() => [
+  "Ringkasan",
+  ...(transfers.value.length ? ["Transfer"] : []),
+  ...(injuries.value.length ? ["Sejarah Cedera"] : []),
+]);
 const tab = ref("Ringkasan");
 
 const MATCH_PREVIEW = 5;
@@ -92,9 +70,17 @@ const followed = ref(false);
 </script>
 
 <template>
-  <NotFoundCard v-if="!name" message="Pemain tidak ditemukan." />
+  <ErrorState
+    v-if="playerQuery.error.value && !isNotFound(playerQuery.error.value)"
+    :error="playerQuery.error.value"
+    @retry="playerQuery.refetch()"
+  />
+  <NotFoundCard
+    v-else-if="playerQuery.error.value"
+    message="Pemain tidak ditemukan."
+  />
 
-  <div v-else class="space-y-4">
+  <div v-else-if="name" class="space-y-4">
     <PageHeader :crumbs="crumbs" :title="name" icon="user">
       <template #actions>
         <Button

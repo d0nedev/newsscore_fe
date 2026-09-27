@@ -1,4 +1,4 @@
-import type { Match, Team } from "~/types/match";
+import type { Match, Team } from "../../../app/types/match";
 
 const team = (id: string, name: string, badge: string): Team => ({
   id,

@@ -1,17 +1,15 @@
 <script setup lang="ts">
 import { Star } from "@lucide/vue";
-import { findLeague } from "~/data/leagues";
-import { matchesByTeam } from "~/data/matches";
-import { findTeam } from "~/data/teams";
 import { slugify } from "~/utils/slug";
 
 const route = useRoute();
-const team = computed(() => findTeam(String(route.params.team)));
+const teamQuery = useTeam(() => String(route.params.team));
+const team = computed(() => teamQuery.data.value);
+
 useHead(() => ({ title: team.value?.name ?? "Tim tidak ditemukan" }));
 
-const league = computed(() =>
-  team.value ? findLeague(team.value.leagueId) : undefined,
-);
+const leagueQuery = useLeague(() => team.value?.leagueId);
+const league = computed(() => leagueQuery.data.value);
 const crumbs = computed(() => [
   { label: "Sepak Bola", to: "/" },
   ...(league.value
@@ -29,18 +27,7 @@ const crumbs = computed(() => [
     : []),
 ]);
 
-const tabs = [
-  "Ringkasan",
-  "Peluang",
-  "Hasil Pertandingan",
-  "Jadwal Pertandingan",
-  "Klasemen",
-  "Transfer",
-  "Skuad",
-] as const;
-const tab = ref<string>(tabs[0]);
-
-const all = computed(() => (team.value ? matchesByTeam(team.value.id) : []));
+const all = computed(() => team.value?.matches ?? []);
 const results = computed(() =>
   all.value.filter((match) => match.status !== "scheduled"),
 );
@@ -51,6 +38,17 @@ const withOdds = computed(() =>
   all.value.filter((match) => match.odds?.length),
 );
 const transfers = computed(() => team.value?.transfers ?? []);
+
+const tabs = computed(() => [
+  "Ringkasan",
+  ...(withOdds.value.length ? ["Peluang"] : []),
+  "Hasil Pertandingan",
+  "Jadwal Pertandingan",
+  ...(league.value?.standings.length ? ["Klasemen"] : []),
+  ...(transfers.value.length ? ["Transfer"] : []),
+  "Skuad",
+]);
+const tab = ref("Ringkasan");
 
 // The summary tab previews each list; the dedicated tabs show everything.
 const PREVIEW = 10;
@@ -75,9 +73,17 @@ const capacity = new Intl.NumberFormat("id-ID");
 </script>
 
 <template>
-  <NotFoundCard v-if="!team" message="Tim tidak ditemukan." />
+  <ErrorState
+    v-if="teamQuery.error.value && !isNotFound(teamQuery.error.value)"
+    :error="teamQuery.error.value"
+    @retry="teamQuery.refetch()"
+  />
+  <NotFoundCard
+    v-else-if="teamQuery.error.value"
+    message="Tim tidak ditemukan."
+  />
 
-  <div v-else class="space-y-4">
+  <div v-else-if="team" class="space-y-4">
     <PageHeader :crumbs="crumbs" :title="team.name" icon="shield">
       <template #actions>
         <Button
@@ -94,14 +100,14 @@ const capacity = new Intl.NumberFormat("id-ID");
       </template>
 
       <template #meta>
-        <MetaLine label="Stadion" class="mt-1">
+        <MetaLine v-if="team.venue" label="Stadion" class="mt-1">
           {{ team.venue
           }}<template v-if="team.city"> ({{ team.city }})</template>
         </MetaLine>
-        <MetaLine label="Kapasitas">
+        <MetaLine v-if="team.capacity" label="Kapasitas">
           <span class="tabular-nums">{{ capacity.format(team.capacity) }}</span>
         </MetaLine>
-        <MetaLine label="Berdiri">
+        <MetaLine v-if="team.founded" label="Berdiri">
           <span class="tabular-nums">{{ team.founded }}</span>
         </MetaLine>
       </template>
@@ -175,11 +181,7 @@ const capacity = new Intl.NumberFormat("id-ID");
       <MatchGroups :matches="fixtures" :perspective-team-id="team.id" />
     </SectionCard>
 
-    <StandingsBlock
-      v-else-if="tab === 'Klasemen' && league"
-      :league="league"
-      :matches="all"
-    />
+    <StandingsBlock v-else-if="tab === 'Klasemen' && league" :league="league" />
 
     <SectionCard
       v-else-if="tab === 'Transfer'"
