@@ -14,7 +14,7 @@ defineProps<{ items: Crumb[] }>();
 <template>
   <nav
     aria-label="Remah roti"
-    class="text-muted-foreground flex items-center gap-1 border-b px-4 py-2 text-xs font-semibold uppercase"
+    class="text-muted-foreground flex items-center gap-1 border-b px-4 py-3 text-xs font-semibold uppercase"
   >
     <template v-for="(item, i) in items" :key="item.label">
       <ChevronRight v-if="i > 0" class="size-3 shrink-0" />

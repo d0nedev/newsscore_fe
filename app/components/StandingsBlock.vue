@@ -19,10 +19,10 @@ const rows = computed(() =>
 <template>
   <section class="space-y-2">
     <div class="flex flex-wrap gap-2">
-      <Badge class="rounded-full px-3 py-1 text-xs uppercase">Klasemen</Badge>
+      <Badge class="px-3 py-1 text-xs uppercase">Klasemen</Badge>
       <Badge
         variant="outline"
-        class="text-muted-foreground rounded-full px-3 py-1 text-xs uppercase"
+        class="text-muted-foreground px-3 py-1 text-xs uppercase"
         >Pola</Badge
       >
     </div>

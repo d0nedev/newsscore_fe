@@ -30,7 +30,7 @@ const cardId = useCardId("header");
       <slot name="aside" />
     </div>
 
-    <div v-if="$slots.tabs" class="px-2">
+    <div v-if="$slots.tabs" class="border-t px-2">
       <slot name="tabs" />
     </div>
   </Card>
