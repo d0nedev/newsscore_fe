@@ -31,7 +31,7 @@ const year = new Date().getFullYear();
 <template>
   <div class="bg-muted text-foreground flex min-h-screen flex-col">
     <header class="bg-header text-header-foreground">
-      <div class="mx-auto flex max-w-[1240px] items-center gap-2 px-4 py-3">
+      <div class="mx-auto flex max-w-[1240px] items-center gap-2 px-4 py-5">
         <NuxtLink to="/" class="text-2xl font-extrabold tracking-tight">
           NEWS<span class="bg-primary ml-1 rounded px-1.5">SCORE</span>
         </NuxtLink>
