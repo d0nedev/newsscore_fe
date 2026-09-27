@@ -1,79 +1,195 @@
-# Desain Kontrak API (Backend) - NewsScore
+# Kontrak API (Backend) - NewsScore
 
-Berdasarkan arsitektur *frontend* dan tipe data yang sudah ada, aplikasi mengadopsi standar respons pembungkus (wrapper) berupa `ApiResponse<T>` untuk data tunggal dan `CursorPage<T>` untuk data yang di-pavinasi dengan *cursor*. Berikut adalah daftar *endpoint* REST API yang perlu dibangun di sisi backend, termasuk fitur autentikasi dan personalisasi Pin.
+Sumber kebenaran: `app/types/api.ts`, `app/types/match.ts`, `app/services/api-client.ts`,
+`app/utils/api-error.ts`, dan mock di `app/data/*` (setiap endpoint di bawah menggantikan satu helper mock).
+
+Base URL: `NUXT_PUBLIC_API_BASE_URL` (mis. `http://localhost:8080`), prefix `/api/v1`.
+
+
+> **Status (27.09.2026):** FE sekarang terhubung ke OpenAPI backend `newsscore 1.0.0`, bukan ke rencana di bawah.
+> Pemetaan respons API ke tipe UI ada di `app/composables/useApi.ts`. Rencana di bawah tetap berlaku sebagai daftar kebutuhan yang **belum** ada di backend:
+>
+> | Kebutuhan FE | Status backend | Dampak di FE sekarang |
+> |---|---|---|
+> | `GET /leagues`, `leagueId` di `Match` | **sudah ada** | dipakai; tabel beranda = 1 request `/leagues/{id}` per liga |
+> | slug negara / halaman negara | nama negara saja | slug dibuat FE lewat `slugify` |
+> | kompetisi di match log pemain | belum ada | kolom kompetisi kosong |
+> | `/matches` rentang tanggal / per liga | hanya per tanggal | halaman liga & negara menampilkan 7 hari (7 request) |
+> | `/me/pins` | belum ada | pin disimpan di `localStorage` |
+> | round, venue, wasit, penonton, kapasitas, babak pertama | belum ada | disembunyikan |
+> | H2H, odds, komentar, rating pemain | belum ada | tab disembunyikan |
+> | venue/kapasitas/berdiri/transfer tim | belum ada | disembunyikan |
+> | posisi selain GK, usia, menit, transfer, cedera, karier pemain | belum ada | grup "Pemain", tab disembunyikan |
+> | arsip musim | belum ada | tab disembunyikan |
+> | `/matches/stream` (SSE), `/search`, auth UI | ada di backend | belum dipakai FE (live pakai polling) |
 
 ---
 
-## Standar Format Respons
+## Konvensi Umum
 
-**1. Sukses (Data Tunggal)**
+- **Auth:** sesi di cookie **HttpOnly** yang di-set API (frontend kirim `credentials: "include"`, JS tidak pernah melihat token). Jadi **bukan** `Authorization: Bearer`.
+- **CORS:** `Access-Control-Allow-Origin: <origin FE persis>` (bukan `*`) + `Access-Control-Allow-Credentials: true`. Expose header `X-Request-Id`.
+- **ID:** string slug (`"liga-primer"`, `"arsenal"`), dipakai langsung di URL FE (`/sepak-bola/:league`, `/tim/:team`, `/pemain/:player`, `/pertandingan/:match`).
+- **Tanggal:** FE saat ini pakai string `"DD.MM.YYYY"` (match log pemain `"DD.MM.YY"`, awal/akhir musim `"DD.MM"`). Backend boleh kirim format itu dulu; migrasi ke ISO 8601 butuh perubahan FE.
+- **Field opsional** (`?` di tipe TS) boleh tidak dikirim / `null`.
+
+### Sukses
+
 ```json
-{
-  "data": { ... }
-}
+{ "data": { } }                                   // ApiResponse<T>
+{ "data": [ ], "meta": { "nextCursor": "abc|null" } }  // CursorPage<T>, cursor opaque
 ```
 
-**2. Sukses (Koleksi / Pagination)**
+Query pagination: `?cursor=<nextCursor>&limit=<n>`.
+
+### Error (`ApiErrorBody`)
+
 ```json
 {
-  "data": [ ... ],
-  "meta": {
-    "nextCursor": "string_cursor_atau_null"
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Match not found",
+    "details": { "field": "pesan" }
   }
 }
 ```
 
----
-
-## Daftar Endpoint API
-
-### 0. Autentikasi & Personalisasi (Pin)
-Karena data *pin* disimpan di server, kita memerlukan mekanisme akun pengguna.
-
-**`POST /api/v1/auth/login`**
-*   **Request Body:** `{ "email": "...", "password": "..." }`
-*   **Response:** `{ "data": { "token": "jwt_token_here", "user": { ... } } }`
-
-**`GET /api/v1/me/pins`**
-*   **Fungsi:** Mengambil semua daftar id liga, tim, dan negara yang di-pin oleh user yang sedang *login*.
-*   **Header:** `Authorization: Bearer <token>`
-*   **Response:** 
-    ```json
-    {
-      "data": {
-        "pinnedLeagues": ["uuid-liga-1", "uuid-liga-2"],
-        "pinnedTeams": ["uuid-tim-1"],
-        "pinnedCountries": ["uuid-negara-1"]
-      }
-    }
-    ```
-
-**`POST /api/v1/me/pins/:type`**
-*   **Fungsi:** Menambahkan pin baru. Parameter `:type` bisa diisi `leagues`, `teams`, atau `countries`.
-*   **Request Body:** `{ "id": "uuid-dari-entity-yang-dipin" }`
-*   **Response:** `{ "data": { "success": true } }`
-
-**`DELETE /api/v1/me/pins/:type/:id`**
-*   **Fungsi:** Menghapus pin.
+Status yang dipetakan FE: `400/422` validation (`details` = map field -> string), `401`, `403`, `404`, `409`, `5xx`.
+Selalu kirim header `X-Request-Id`.
 
 ---
 
-*(Sisa Endpoint Tetap Sama)*
+## Model Data
 
-### 1. Pertandingan (Matches)
-*   `GET /api/v1/matches` - Daftar pertandingan (opsional filter `date`, `leagueId`, `status`).
-*   `GET /api/v1/matches/:id` - Detail lengkap satu pertandingan.
+```ts
+type MatchStatus = "scheduled" | "live" | "finished";
 
-### 2. Liga (Leagues) & Klasemen
-*   `GET /api/v1/leagues` - Daftar liga.
-*   `GET /api/v1/leagues/:id` - Detail liga, termasuk `standings` dan `archive`.
+Team        { id, name, badge }                       // badge = kode singkat, mis. "ARS"
 
-### 3. Tim (Teams)
-*   `GET /api/v1/teams/:id` - Profil tim, termasuk `squad` dan `transfers`. (Tim Nasional memiliki pola yang sama, hanya ditandai dengan flag `is_national_team = true` di database).
+Match {
+  id, leagueId, status,
+  time,            // jam kick-off (scheduled) atau menit berjalan (live), mis. "67'"
+  date,            // "DD.MM.YYYY"
+  round, venue,
+  home: Team, away: Team,
+  score: [number, number] | null,
+  halfTime?: [number, number],
+  events:  { minute, team: "home"|"away", type: "goal"|"yellow"|"red"|"sub", player, note?, assist? }[],
+  stats:   { label, home, away, percent? }[],
+  lineups: { home: LineupPlayer[], away: LineupPlayer[] },   // LineupPlayer { number, name, playerId? }
+  headToHead: { date, label, score }[],
+  odds?:        { bookmaker, home, draw, away }[],
+  commentary?:  { minute: string, text, highlight? }[],
+  playerStats?: { team, name, playerId?, rating, goals, assists, shots }[],
+  referee?, attendance?: number, broadcasters?: string[],
+  capacity?: number  // hanya di detail
+}
 
-### 4. Pemain (Players)
-*   `GET /api/v1/players/:id` - Profil pemain, karier, log laga terbaru.
+League {
+  id, country, name, season,
+  type?: "league" | "cup" | "friendly",
+  start?, end?,                       // "DD.MM"
+  standings: StandingRow[],           // [] untuk piala/friendly
+  archive: { season, winner, runnerUp }[]
+}
+StandingRow { position, teamId, team, played, won, drawn, lost, goalsFor, goalsAgainst, points, form: ("W"|"D"|"L")[] } // form terbaru dulu
 
-### 5. Berita (News)
-*   `GET /api/v1/news` - Daftar artikel berita.
-*   `GET /api/v1/news/:id` - Detail artikel berita.
+TeamProfile extends Team {
+  leagueId, venue, capacity, founded, city?,
+  squad: { id, name, number, position: "GK"|"DF"|"MF"|"FW", age, matches, goals, assists }[],
+  transfers?: { date, player, playerId?, direction: "in"|"out", club, fee }[]
+}
+
+PlayerProfile {
+  id, name, teamId, position, number, age, country, height, foot: "Kiri"|"Kanan",
+  birthDate?, marketValue?, contractUntil?, goalkeeper?,
+  season: { matches, goals, assists, minutes },
+  matchLog?: { date, competition, country, matchId?, home, away, score: [n,n],
+               outcome: "W"|"D"|"L", rating?, minutes?, detail?, yellow?, red?, note? }[],
+  career?: { group: "Liga"|"Piala Domestik"|"Piala Internasional"|"Tim Nasional",
+             season, teamId?, team, competition, country, rating?, apps,
+             savePct?, cleanSheets?, goals?, assists?, yellow, red }[],
+  transfers: { season, date?, from, to, type?, fee }[],
+  injuries:  { season, issue, from, to }[]
+}
+
+NewsItem { id, category, title, summary, published }  // published = label relatif ("2 jam lalu")
+```
+
+---
+
+## Endpoint
+
+### Navigasi / layout (`layouts/default.vue`, `DateNav.vue`)
+
+| Method | Path                | Response                                                                                       | Pengganti mock                               |
+| ------ | ------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| GET    | `/api/v1/meta`      | `{ data: { today: "DD.MM.YYYY", matchDates: string[], liveCount: number, sports: string[] } }` | `today`, `matchDates`, `liveCount`, `sports` |
+| GET    | `/api/v1/countries` | `{ data: { name, slug }[] }` (hanya negara yang punya kompetisi)                               | `countries`, `findCountry`                   |
+
+`liveCount` sebaiknya dipoll (atau pisah ke `/api/v1/matches/live/count`) karena berubah terus.
+
+### Kompetisi
+
+| Method | Path                                         | Response                                                                                                             |
+| ------ | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/api/v1/leagues?country=<slug>&type=league` | `{ data: League[] }` — ringkas boleh tanpa `archive`; `standings` dibutuhkan beranda (`StandingsOverview`) & sidebar |
+| GET    | `/api/v1/leagues/:id`                        | `{ data: League }` lengkap (standings + archive), 404 jika tidak ada                                                 |
+
+Tanpa filter = semua kompetisi (`competitions`). `type=league` = hanya yang punya klasemen (`leagues`). `country` menggantikan `competitionsByCountry`.
+
+### Pertandingan
+
+| Method | Path                                                                       | Response                                                                                                   |
+| ------ | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| GET    | `/api/v1/matches?date=DD.MM.YYYY&leagueId=&teamId=&country=<slug>&status=` | `CursorPage<Match>` — versi list boleh tanpa `events/stats/lineups/headToHead/odds/commentary/playerStats` |
+| GET    | `/api/v1/matches/:id`                                                      | `{ data: Match }` lengkap, 404 jika tidak ada                                                              |
+
+Dipakai: beranda (`date`), halaman liga (`leagueId`), negara (`country`), halaman tim (`teamId`). Match status `live` perlu refresh berkala (polling / SSE nanti).
+
+### Tim
+
+| Method | Path                | Response                                    |
+| ------ | ------------------- | ------------------------------------------- |
+| GET    | `/api/v1/teams/:id` | `{ data: TeamProfile }`, 404 jika tidak ada |
+
+`GET /matches/:id` wajib menyertakan `capacity` (kapasitas stadion tuan rumah, dipakai `MatchInfo`).
+
+### Pemain
+
+| Method | Path                  | Response                                                       |
+| ------ | --------------------- | -------------------------------------------------------------- |
+| GET    | `/api/v1/players/:id` | `{ data: PlayerProfile & { team: Team } }`, 404 jika tidak ada |
+
+Wajib ada untuk **setiap** pemain di `squad` tim: sekarang FE fallback ke entri squad bila profil tidak ada — backend sebaiknya selalu kembalikan profil (field opsional kosong). Sertakan `team` agar FE tidak perlu request kedua.
+
+### Berita
+
+| Method | Path                                                     | Response                                                                 |
+| ------ | -------------------------------------------------------- | ------------------------------------------------------------------------ |
+| GET    | `/api/v1/news?matchId=&leagueId=&teamId=&cursor=&limit=` | `CursorPage<NewsItem>`                                                   |
+| GET    | `/api/v1/news/:id`                                       | `{ data: NewsItem & { body: string } }` — belum ada halaman detail di FE |
+
+Tab "Berita" di halaman pertandingan saat ini memakai list global; filter `matchId` untuk nanti.
+
+### Pin (personalisasi)
+
+FE saat ini hanya pin **liga** (`usePinnedLeagues`, state lokal, default liga pertama). Tim/negara belum ada di UI.
+
+| Method | Path                          | Body | Response                          |
+| ------ | ----------------------------- | ---- | --------------------------------- |
+| GET    | `/api/v1/me/pins`             | –    | `{ data: { leagues: string[] } }` |
+| PUT    | `/api/v1/me/pins/leagues/:id` | –    | `204` (idempotent)                |
+| DELETE | `/api/v1/me/pins/leagues/:id` | –    | `204`                             |
+
+Tanpa login: `401`, FE tetap pakai state lokal.
+
+### Auth (belum ada UI, dibutuhkan untuk pin di server)
+
+| Method | Path                  | Body                  | Response                                                                            |
+| ------ | --------------------- | --------------------- | ----------------------------------------------------------------------------------- |
+| POST   | `/api/v1/auth/login`  | `{ email, password }` | `{ data: { user: { id, email, name } } }` + `Set-Cookie` HttpOnly, Secure, SameSite |
+| POST   | `/api/v1/auth/logout` | –                     | `204`, hapus cookie                                                                 |
+| GET    | `/api/v1/me`          | –                     | `{ data: { id, email, name } }` atau `401`                                          |
+
+Validasi gagal: `422` dengan `details: { email: "...", password: "..." }`.
