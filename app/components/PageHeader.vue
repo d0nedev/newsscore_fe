@@ -8,10 +8,12 @@ defineProps<{
   initials?: string;
   logo?: string;
 }>();
+
+const cardId = useCardId("header");
 </script>
 
 <template>
-  <Card class="gap-0 py-0">
+  <Card :data-card="cardId" class="gap-0 py-0">
     <AppBreadcrumb :items="crumbs" />
 
     <div class="flex items-start gap-4 p-4">
@@ -26,6 +28,10 @@ defineProps<{
       </div>
 
       <slot name="aside" />
+    </div>
+
+    <div v-if="$slots.tabs" class="px-2">
+      <slot name="tabs" />
     </div>
   </Card>
 </template>

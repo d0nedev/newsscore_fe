@@ -113,12 +113,15 @@ const pinned = computed(() => isPinned(league.value?.id));
           </p>
         </div>
       </template>
-    </PageHeader>
 
-    <TabNav v-model="tab" :tabs="tabs" />
+      <template #tabs>
+        <TabNav v-model="tab" :tabs="tabs" />
+      </template>
+    </PageHeader>
 
     <template v-if="tab === 'Ringkasan'">
       <SectionCard
+        card="ringkasan-jadwal"
         title="Jadwal"
         :empty="fixtures.length ? undefined : 'Belum ada jadwal.'"
         :more-label="

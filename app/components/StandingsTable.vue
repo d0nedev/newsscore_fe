@@ -28,10 +28,12 @@ const legendItems = [
   { color: "bg-rose-800", text: "Promosi - Europa League (Fase Liga)" },
   { color: "bg-destructive", text: "Degradasi - Championship" },
 ];
+
+const cardId = useCardId("tabel-klasemen");
 </script>
 
 <template>
-  <Card class="overflow-hidden py-0">
+  <Card :data-card="cardId" class="overflow-hidden py-0">
     <CardContent class="px-0">
       <Table class="text-sm">
         <TableHeader>

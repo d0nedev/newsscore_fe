@@ -29,7 +29,7 @@ const year = new Date().getFullYear();
 </script>
 
 <template>
-  <div class="bg-muted text-foreground min-h-screen">
+  <div class="bg-muted text-foreground flex min-h-screen flex-col">
     <header class="bg-header text-header-foreground">
       <div class="mx-auto flex max-w-[1240px] items-center gap-2 px-4 py-3">
         <NuxtLink to="/" class="text-2xl font-extrabold tracking-tight">
@@ -88,7 +88,7 @@ const year = new Date().getFullYear();
       </ul>
     </nav>
 
-    <div class="mx-auto flex max-w-[1240px] gap-4 px-4 py-4">
+    <div class="mx-auto flex w-full max-w-[1240px] flex-1 gap-4 px-4 py-4">
       <aside class="hidden w-52 shrink-0 space-y-6 lg:block">
         <nav aria-label="Liga yang disematkan">
           <h2

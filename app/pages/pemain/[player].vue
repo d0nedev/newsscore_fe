@@ -135,9 +135,11 @@ const followed = ref(false);
           class="hidden sm:grid"
         />
       </template>
-    </PageHeader>
 
-    <TabNav v-if="player" v-model="tab" :tabs="tabs" />
+      <template v-if="player" #tabs>
+        <TabNav v-model="tab" :tabs="tabs" />
+      </template>
+    </PageHeader>
 
     <template v-if="tab === 'Ringkasan'">
       <SectionCard v-if="season" title="Statistik musim ini" :flush="false">
@@ -181,6 +183,7 @@ const followed = ref(false);
 
       <SectionCard
         v-if="transfers.length"
+        card="ringkasan-transfer"
         title="Transfer"
         scroll
         :more-label="
@@ -195,6 +198,7 @@ const followed = ref(false);
 
       <SectionCard
         v-if="injuries.length"
+        card="ringkasan-sejarah-cedera"
         title="Sejarah cedera"
         :more-label="
           !showAllInjuries && injuries.length > INJURY_PREVIEW

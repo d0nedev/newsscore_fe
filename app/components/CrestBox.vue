@@ -36,14 +36,14 @@ const glyph = computed(
     :is="to ? 'NuxtLink' : 'span'"
     :to="to"
     :aria-label="label"
-    class="bg-muted grid size-16 shrink-0 place-items-center rounded-lg border"
+    class="bg-muted grid size-16 shrink-0 place-items-center overflow-hidden rounded-lg border"
   >
     <img
       v-if="logo && !failed"
       :src="logo"
       alt=""
       aria-hidden="true"
-      class="size-12 object-contain"
+      class="size-full object-contain"
       @error="failed = true"
     />
     <span v-else-if="initials" class="text-lg font-bold">{{ initials }}</span>

@@ -58,6 +58,8 @@ const crumbs = computed(() => [
 ]);
 
 const starred = ref({ home: false, away: false });
+
+const headerCardId = useCardId("papan-skor");
 </script>
 
 <template>
@@ -72,7 +74,7 @@ const starred = ref({ home: false, away: false });
   />
 
   <div v-else-if="match" class="space-y-4">
-    <Card class="gap-0 overflow-hidden py-0">
+    <Card :data-card="headerCardId" class="gap-0 overflow-hidden py-0">
       <AppBreadcrumb :items="crumbs" />
 
       <section
@@ -159,86 +161,98 @@ const starred = ref({ home: false, away: false });
           @update:model-value="openDetail"
         />
       </div>
+    </Card>
 
-      <div
-        v-if="mainTab === 'Pertandingan'"
-        :id="tabPanelId('detail', subTab)"
-        role="tabpanel"
-        :aria-labelledby="tabId('detail', subTab)"
-        tabindex="0"
-      >
-        <template v-if="subTab === 'Ringkasan'">
+    <div
+      v-if="mainTab === 'Pertandingan'"
+      :id="tabPanelId('detail', subTab)"
+      role="tabpanel"
+      :aria-labelledby="tabId('detail', subTab)"
+      tabindex="0"
+      class="space-y-4"
+    >
+      <template v-if="subTab === 'Ringkasan'">
+        <SectionCard title="Jalannya pertandingan">
           <MatchEvents :match="match" />
+        </SectionCard>
 
-          <template v-if="match.stats.length">
-            <SubHeading>Statistik</SubHeading>
-            <MatchStats :stats="match.stats.slice(0, 5)" />
-          </template>
+        <SectionCard
+          v-if="match.stats.length"
+          card="ringkasan-statistik"
+          title="Statistik"
+        >
+          <MatchStats :stats="match.stats.slice(0, 5)" />
+        </SectionCard>
 
-          <template v-if="match.broadcasters?.length">
-            <SubHeading>Chanel televisi</SubHeading>
-            <p class="flex items-center gap-2 px-3 py-2 text-sm">
-              <Tv class="text-muted-foreground size-4" />
-              {{ match.broadcasters.join(", ") }}
-            </p>
-          </template>
+        <SectionCard v-if="match.broadcasters?.length" title="Chanel televisi">
+          <p class="flex items-center gap-2 px-4 pb-3 text-sm">
+            <Tv class="text-muted-foreground size-4" />
+            {{ match.broadcasters.join(", ") }}
+          </p>
+        </SectionCard>
 
-          <SubHeading>Informasi pertandingan</SubHeading>
+        <SectionCard title="Informasi pertandingan">
           <MatchInfo :match="match" />
-        </template>
+        </SectionCard>
+      </template>
 
-        <template v-else-if="subTab === 'Statistik'">
-          <p
-            v-if="match.stats.length === 0"
-            class="text-muted-foreground p-4 text-sm"
-          >
-            Statistik belum tersedia.
-          </p>
-          <MatchStats v-else :stats="match.stats" />
-        </template>
+      <SectionCard
+        v-else-if="subTab === 'Statistik'"
+        title="Statistik"
+        :empty="match.stats.length ? undefined : 'Statistik belum tersedia.'"
+      >
+        <MatchStats :stats="match.stats" />
+      </SectionCard>
 
-        <template v-else-if="subTab === 'Susunan Pemain'">
-          <p
-            v-if="match.lineups.home.length === 0"
-            class="text-muted-foreground p-4 text-sm"
+      <SectionCard
+        v-else-if="subTab === 'Susunan Pemain'"
+        title="Susunan pemain"
+        :empty="
+          match.lineups.home.length
+            ? undefined
+            : 'Susunan pemain belum diumumkan.'
+        "
+      >
+        <div class="grid sm:grid-cols-2 sm:divide-x">
+          <div
+            v-for="side in ['home', 'away'] as const"
+            :key="side"
+            class="p-3"
           >
-            Susunan pemain belum diumumkan.
-          </p>
-          <div v-else class="grid sm:grid-cols-2 sm:divide-x">
-            <div
-              v-for="side in ['home', 'away'] as const"
-              :key="side"
-              class="p-3"
+            <h3
+              class="text-muted-foreground mb-2 text-xs font-semibold uppercase"
             >
-              <h3
-                class="text-muted-foreground mb-2 text-xs font-semibold uppercase"
+              {{ side === "home" ? match.home.name : match.away.name }}
+            </h3>
+            <ul class="space-y-1 text-sm">
+              <li
+                v-for="player in match.lineups[side]"
+                :key="player.number"
+                class="flex gap-2"
               >
-                {{ side === "home" ? match.home.name : match.away.name }}
-              </h3>
-              <ul class="space-y-1 text-sm">
-                <li
-                  v-for="player in match.lineups[side]"
-                  :key="player.number"
-                  class="flex gap-2"
+                <span
+                  class="text-muted-foreground w-6 text-right tabular-nums"
+                  >{{ player.number }}</span
                 >
-                  <span
-                    class="text-muted-foreground w-6 text-right tabular-nums"
-                    >{{ player.number }}</span
-                  >
-                  <NuxtLink
-                    v-if="player.playerId"
-                    :to="`/pemain/${player.playerId}`"
-                    class="hover:underline"
-                    >{{ player.name }}</NuxtLink
-                  >
-                  <span v-else>{{ player.name }}</span>
-                </li>
-              </ul>
-            </div>
+                <NuxtLink
+                  v-if="player.playerId"
+                  :to="`/pemain/${player.playerId}`"
+                  class="hover:underline"
+                  >{{ player.name }}</NuxtLink
+                >
+                <span v-else>{{ player.name }}</span>
+              </li>
+            </ul>
           </div>
-        </template>
+        </div>
+      </SectionCard>
 
-        <Table v-else-if="subTab === 'Statistik Pemain'">
+      <SectionCard
+        v-else-if="subTab === 'Statistik Pemain'"
+        title="Statistik pemain"
+        scroll
+      >
+        <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Pemain</TableHead>
@@ -278,79 +292,76 @@ const starred = ref({ home: false, away: false });
             </TableRow>
           </TableBody>
         </Table>
+      </SectionCard>
 
-        <template v-else>
-          <SubHeading>Komentar langsung</SubHeading>
-          <ul class="divide-y text-sm">
-            <li
-              v-for="line in match.commentary"
-              :key="line.minute + line.text"
-              class="flex gap-3 px-3 py-2"
-              :class="line.highlight ? 'bg-accent font-medium' : ''"
-            >
-              <span class="text-muted-foreground w-10 shrink-0 tabular-nums">{{
-                line.minute
-              }}</span>
-              <span class="flex-1">{{ line.text }}</span>
-            </li>
-          </ul>
-        </template>
-      </div>
-
-      <template v-else-if="mainTab === 'H2H'">
-        <SubHeading>Pertemuan terakhir</SubHeading>
-        <p
-          v-if="match.headToHead.length === 0"
-          class="text-muted-foreground p-4 text-sm"
-        >
-          Belum ada pertemuan sebelumnya.
-        </p>
-        <ul v-else class="divide-y text-sm">
+      <SectionCard v-else title="Komentar langsung">
+        <ul class="divide-y border-t text-sm">
           <li
-            v-for="game in match.headToHead"
-            :key="game.date"
-            class="flex items-center gap-3 px-3 py-2"
+            v-for="line in match.commentary"
+            :key="line.minute + line.text"
+            class="flex gap-3 px-3 py-2"
+            :class="line.highlight ? 'bg-accent font-medium' : ''"
           >
-            <span class="text-muted-foreground w-24 shrink-0 tabular-nums">{{
-              game.date
+            <span class="text-muted-foreground w-10 shrink-0 tabular-nums">{{
+              line.minute
             }}</span>
-            <span class="flex-1">{{ game.label }}</span>
-            <span class="font-semibold tabular-nums">{{ game.score }}</span>
+            <span class="flex-1">{{ line.text }}</span>
           </li>
         </ul>
-      </template>
+      </SectionCard>
+    </div>
 
-      <template v-else-if="mainTab === 'Peluang'">
-        <SubHeading>Peluang 1X2</SubHeading>
-        <p class="text-muted-foreground px-3 pt-2 text-xs">
-          Angka dummy untuk tampilan, bukan peluang sungguhan.
-        </p>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Bandar</TableHead>
-              <TableHead class="text-right">1</TableHead>
-              <TableHead class="text-right">X</TableHead>
-              <TableHead class="text-right">2</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-for="row in match.odds" :key="row.bookmaker">
-              <TableCell>{{ row.bookmaker }}</TableCell>
-              <TableCell class="text-right tabular-nums">{{
-                row.home.toFixed(2)
-              }}</TableCell>
-              <TableCell class="text-right tabular-nums">{{
-                row.draw.toFixed(2)
-              }}</TableCell>
-              <TableCell class="text-right tabular-nums">{{
-                row.away.toFixed(2)
-              }}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </template>
-    </Card>
+    <SectionCard
+      v-else-if="mainTab === 'H2H'"
+      title="Pertemuan terakhir"
+      :empty="
+        match.headToHead.length ? undefined : 'Belum ada pertemuan sebelumnya.'
+      "
+    >
+      <ul class="divide-y border-t text-sm">
+        <li
+          v-for="game in match.headToHead"
+          :key="game.date"
+          class="flex items-center gap-3 px-3 py-2"
+        >
+          <span class="text-muted-foreground w-24 shrink-0 tabular-nums">{{
+            game.date
+          }}</span>
+          <span class="flex-1">{{ game.label }}</span>
+          <span class="font-semibold tabular-nums">{{ game.score }}</span>
+        </li>
+      </ul>
+    </SectionCard>
+
+    <SectionCard v-else-if="mainTab === 'Peluang'" title="Peluang 1X2">
+      <p class="text-muted-foreground px-4 pb-2 text-xs">
+        Angka dummy untuk tampilan, bukan peluang sungguhan.
+      </p>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Bandar</TableHead>
+            <TableHead class="text-right">1</TableHead>
+            <TableHead class="text-right">X</TableHead>
+            <TableHead class="text-right">2</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow v-for="row in match.odds" :key="row.bookmaker">
+            <TableCell>{{ row.bookmaker }}</TableCell>
+            <TableCell class="text-right tabular-nums">{{
+              row.home.toFixed(2)
+            }}</TableCell>
+            <TableCell class="text-right tabular-nums">{{
+              row.draw.toFixed(2)
+            }}</TableCell>
+            <TableCell class="text-right tabular-nums">{{
+              row.away.toFixed(2)
+            }}</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </SectionCard>
 
     <NewsList v-if="mainTab === 'Berita'" :items="news ?? []" />
   </div>

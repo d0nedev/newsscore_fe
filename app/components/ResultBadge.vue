@@ -13,7 +13,7 @@ defineProps<{ result: "W" | "D" | "L" }>();
 
 <template>
   <Badge
-    class="size-4.5 justify-center rounded-sm p-0 text-[10px] font-bold text-white"
+    class="size-4.5 min-h-0 justify-center rounded-sm p-0 text-[10px] font-bold text-white"
     :class="style[result].color"
     :title="title[result]"
     >{{ style[result].label }}</Badge

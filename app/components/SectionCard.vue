@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ChevronDown } from "@lucide/vue";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
+    /** Card name for `data-card`; defaults to the title. Set it when a title repeats on one page. */
+    card?: string;
     title?: string;
     /** Edge-to-edge body, for tables and match rows. */
     flush?: boolean;
@@ -15,16 +17,19 @@ withDefaults(
   }>(),
   {
     flush: true,
+    card: undefined,
     title: undefined,
     empty: undefined,
     moreLabel: undefined,
   },
 );
 defineEmits<{ more: [] }>();
+
+const cardId = useCardId(props.card ?? props.title ?? "section");
 </script>
 
 <template>
-  <Card class="gap-0 overflow-hidden py-0">
+  <Card :data-card="cardId" class="gap-0 overflow-hidden py-0">
     <CardHeader
       v-if="title || $slots.action"
       class="flex flex-row items-center justify-between gap-2 px-4 py-3"

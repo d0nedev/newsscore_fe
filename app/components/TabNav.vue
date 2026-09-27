@@ -9,12 +9,15 @@ defineEmits<{ "update:modelValue": [string] }>();
     class="w-full"
     @update:model-value="$emit('update:modelValue', String($event))"
   >
-    <TabsList variant="line" class="w-full justify-start overflow-x-auto">
+    <TabsList
+      variant="line"
+      class="w-full justify-start overflow-x-auto p-0 group-data-horizontal/tabs:h-auto"
+    >
       <TabsTrigger
         v-for="tab in tabs"
         :key="tab"
         :value="tab"
-        class="flex-none"
+        class="after:bg-primary h-auto flex-none rounded-none px-2 py-3 group-data-horizontal/tabs:after:bottom-0"
       >
         {{ tab }}
       </TabsTrigger>

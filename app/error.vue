@@ -9,7 +9,7 @@ const notFound = computed(() => props.error.statusCode === 404);
   <div
     class="bg-background grid min-h-screen place-items-center p-4 text-center"
   >
-    <Card class="max-w-sm">
+    <Card data-card="error" class="max-w-sm">
       <CardHeader>
         <CardTitle as="h1" class="text-2xl">
           {{ notFound ? "Halaman tidak ditemukan" : "Terjadi kesalahan" }}

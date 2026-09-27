@@ -116,12 +116,15 @@ const capacity = new Intl.NumberFormat("id-ID");
           <span class="tabular-nums">{{ team.founded }}</span>
         </MetaLine>
       </template>
-    </PageHeader>
 
-    <TabNav v-model="tab" :tabs="tabs" />
+      <template #tabs>
+        <TabNav v-model="tab" :tabs="tabs" />
+      </template>
+    </PageHeader>
 
     <template v-if="tab === 'Ringkasan'">
       <SectionCard
+        card="ringkasan-jadwal"
         title="Jadwal"
         :empty="fixtures.length ? undefined : 'Belum ada jadwal.'"
         :more-label="
@@ -149,6 +152,7 @@ const capacity = new Intl.NumberFormat("id-ID");
 
       <SectionCard
         v-if="transfers.length"
+        card="ringkasan-transfer"
         title="Transfer"
         scroll
         :more-label="

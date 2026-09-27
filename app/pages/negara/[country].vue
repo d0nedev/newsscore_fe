@@ -39,6 +39,8 @@ const empty = computed(() =>
       ? "Belum ada jadwal untuk negara ini."
       : "Belum ada hasil untuk negara ini.",
 );
+
+const cardId = useCardId("pertandingan");
 </script>
 
 <template>
@@ -53,7 +55,7 @@ const empty = computed(() =>
   />
 
   <div v-else-if="country" class="space-y-4">
-    <Card class="gap-0 overflow-hidden py-0">
+    <Card :data-card="cardId" class="gap-0 overflow-hidden py-0">
       <AppBreadcrumb :items="crumbs" />
 
       <div class="p-3">
