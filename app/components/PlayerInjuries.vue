@@ -19,10 +19,10 @@ defineProps<{ injuries: NonNullable<PlayerProfile["injuries"]> }>();
     </TableHeader>
     <TableBody>
       <TableRow v-for="injury in injuries" :key="injury.from">
-        <TableCell class="text-muted-foreground pl-4 tabular-nums">
+        <TableCell class="text-muted-foreground pl-4 font-score">
           {{ injury.from }}
         </TableCell>
-        <TableCell class="text-muted-foreground tabular-nums">
+        <TableCell class="text-muted-foreground font-score">
           {{ injury.to }}
         </TableCell>
         <TableCell class="pr-4">

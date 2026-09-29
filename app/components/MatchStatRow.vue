@@ -10,9 +10,9 @@ const value = (side: "home" | "away") =>
 <template>
   <li class="px-3 py-3">
     <p class="flex items-center justify-between text-sm">
-      <span class="w-12 font-semibold tabular-nums">{{ value("home") }}</span>
+      <span class="w-12 font-semibold font-score">{{ value("home") }}</span>
       <span class="text-sm font-bold">{{ stat.label }}</span>
-      <span class="w-12 text-right font-semibold tabular-nums">{{
+      <span class="w-12 text-right font-semibold font-score">{{
         value("away")
       }}</span>
     </p>

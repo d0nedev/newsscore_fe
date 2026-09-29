@@ -4,7 +4,8 @@ import type { Match } from "~/types/match";
 
 const props = defineProps<{ match: Match; league?: string }>();
 
-const starred = ref(false);
+const followed = useFollowed("match");
+const starred = computed(() => followed.isFollowed(props.match.id));
 
 const label = computed(() => {
   if (props.match.status === "live") return props.match.time;
@@ -14,7 +15,9 @@ const label = computed(() => {
 </script>
 
 <template>
-  <div class="hover:bg-muted/60 flex items-center gap-3 px-3 py-3">
+  <div
+    class="hover:bg-muted/60 flex items-center gap-3 px-3 py-3 transition-colors"
+  >
     <span class="w-16 shrink-0 text-xs">
       <span
         class="block font-bold"
@@ -35,7 +38,7 @@ const label = computed(() => {
       </span>
 
       <span
-        class="w-16 text-center font-bold tabular-nums"
+        class="w-16 text-center font-bold font-score"
         :class="match.status === 'live' ? 'text-primary' : ''"
       >
         <template v-if="match.score">
@@ -57,7 +60,7 @@ const label = computed(() => {
       :class="starred ? 'text-primary' : 'text-muted-foreground/50'"
       :aria-pressed="starred"
       :aria-label="`Ikuti ${match.home.name} - ${match.away.name}`"
-      @click="starred = !starred"
+      @click="followed.toggle(match.id)"
     >
       <Star :fill="starred ? 'currentColor' : 'none'" />
     </Button>

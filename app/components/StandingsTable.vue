@@ -18,14 +18,14 @@ const zone = (position: number) => {
 };
 
 const zoneColor: Record<string, string> = {
-  champions: "bg-sky-700 text-white",
-  europa: "bg-rose-800 text-white",
+  champions: "bg-zone-champions text-white",
+  europa: "bg-zone-europa text-white",
   relegation: "bg-destructive text-white",
 };
 
 const legendItems = [
-  { color: "bg-sky-700", text: "Promosi - Liga Champions (Fase Liga)" },
-  { color: "bg-rose-800", text: "Promosi - Europa League (Fase Liga)" },
+  { color: "bg-zone-champions", text: "Promosi - Liga Champions (Fase Liga)" },
+  { color: "bg-zone-europa", text: "Promosi - Europa League (Fase Liga)" },
   { color: "bg-destructive", text: "Degradasi - Championship" },
 ];
 
@@ -54,7 +54,7 @@ const cardId = useCardId("tabel-klasemen");
           <TableRow v-for="row in rows" :key="row.teamId">
             <TableCell class="pl-3">
               <span
-                class="grid size-5 place-items-center rounded text-[11px] font-bold tabular-nums"
+                class="grid size-5 place-items-center rounded text-[11px] font-bold font-score"
                 :class="
                   zone(row.position)
                     ? zoneColor[zone(row.position)!]
@@ -75,25 +75,21 @@ const cardId = useCardId("tabel-klasemen");
                 <span class="truncate">{{ row.team }}</span>
               </NuxtLink>
             </TableCell>
-            <TableCell class="text-center tabular-nums">{{
+            <TableCell class="text-center font-score">{{
               row.played
             }}</TableCell>
-            <TableCell class="text-center tabular-nums">{{
-              row.won
-            }}</TableCell>
-            <TableCell class="text-center tabular-nums">{{
+            <TableCell class="text-center font-score">{{ row.won }}</TableCell>
+            <TableCell class="text-center font-score">{{
               row.drawn
             }}</TableCell>
-            <TableCell class="text-center tabular-nums">{{
-              row.lost
-            }}</TableCell>
-            <TableCell class="text-center tabular-nums">
+            <TableCell class="text-center font-score">{{ row.lost }}</TableCell>
+            <TableCell class="text-center font-score">
               {{ row.goalsFor }}:{{ row.goalsAgainst }}
             </TableCell>
-            <TableCell class="text-center tabular-nums">
+            <TableCell class="text-center font-score">
               {{ row.goalsFor - row.goalsAgainst }}
             </TableCell>
-            <TableCell class="text-center font-bold tabular-nums">
+            <TableCell class="text-center font-bold font-score">
               {{ row.points }}
             </TableCell>
             <TableCell>

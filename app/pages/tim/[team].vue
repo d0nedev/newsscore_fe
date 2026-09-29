@@ -94,7 +94,7 @@ const capacity = new Intl.NumberFormat("id-ID");
         <Button
           variant="ghost"
           size="icon"
-          class="size-6 shrink-0"
+          class="size-7 shrink-0"
           :class="followed ? 'text-primary' : 'text-muted-foreground'"
           :aria-pressed="followed"
           :aria-label="`Ikuti ${team.name}`"
@@ -110,10 +110,10 @@ const capacity = new Intl.NumberFormat("id-ID");
           }}<template v-if="team.city"> ({{ team.city }})</template>
         </MetaLine>
         <MetaLine v-if="team.capacity" label="Kapasitas">
-          <span class="tabular-nums">{{ capacity.format(team.capacity) }}</span>
+          <span class="font-score">{{ capacity.format(team.capacity) }}</span>
         </MetaLine>
         <MetaLine v-if="team.founded" label="Berdiri">
-          <span class="tabular-nums">{{ team.founded }}</span>
+          <span class="font-score">{{ team.founded }}</span>
         </MetaLine>
       </template>
 
@@ -205,4 +205,7 @@ const capacity = new Intl.NumberFormat("id-ID");
       <SquadTable :players="team.squad" />
     </SectionCard>
   </div>
+  <SectionCard v-else card="memuat">
+    <SkeletonRows :rows="8" />
+  </SectionCard>
 </template>

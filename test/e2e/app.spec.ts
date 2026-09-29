@@ -84,6 +84,34 @@ test("team squad links through to a player profile", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("mobile menu opens the sidebar and closes on navigation", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Menu" }).click();
+  const drawer = page.getByRole("dialog", { name: "Menu" });
+  await drawer
+    .getByRole("navigation", { name: "Kompetisi" })
+    .getByRole("link", { name: "Liga Primer" })
+    .click();
+  await expect(page).toHaveURL("/sepak-bola/liga-primer");
+  await expect(drawer).toHaveCount(0);
+});
+
+test("a starred match stays starred after navigating away", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const star = matchList(page).getByRole("button", { name: /Liverpool/ });
+  await star.click();
+  await expect(star).toHaveAttribute("aria-pressed", "true");
+
+  await page.goto("/sepak-bola/liga-primer");
+  await page.goto("/");
+  await expect(star).toHaveAttribute("aria-pressed", "true");
+});
+
 test("unknown match shows not found", async ({ page }) => {
   await page.goto("/pertandingan/nope");
   await expect(page.getByText("Pertandingan tidak ditemukan.")).toBeVisible();

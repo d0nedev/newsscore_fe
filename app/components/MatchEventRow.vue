@@ -33,7 +33,7 @@ const detail = computed(() => {
         <MatchEventIcon :type="event.type" />
         <span
           v-if="score"
-          class="bg-muted shrink-0 rounded px-1.5 py-0.5 text-xs font-bold tabular-nums"
+          class="bg-muted shrink-0 rounded px-1.5 py-0.5 text-xs font-bold font-score"
           >{{ score }}</span
         >
         <span class="min-w-0">
@@ -48,7 +48,7 @@ const detail = computed(() => {
     </div>
 
     <span
-      class="text-muted-foreground order-2 w-10 text-center text-xs tabular-nums"
+      class="text-muted-foreground order-2 w-10 text-center text-xs font-score"
     >
       {{ event.minuteLabel ?? `${event.minute}'` }}
     </span>

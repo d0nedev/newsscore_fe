@@ -33,14 +33,14 @@ defineProps<{ leagues: League[]; top?: number }>();
                   :to="`/tim/${row.teamId}`"
                   class="hover:text-primary flex items-center gap-2"
                 >
-                  <span class="text-muted-foreground w-3 tabular-nums">{{
+                  <span class="text-muted-foreground w-3 font-score">{{
                     row.position
                   }}</span>
                   <span class="truncate">{{ row.team }}</span>
                 </NuxtLink>
               </td>
-              <td class="text-center tabular-nums">{{ row.played }}</td>
-              <td class="text-center font-semibold tabular-nums">
+              <td class="text-center font-score">{{ row.played }}</td>
+              <td class="text-center font-semibold font-score">
                 {{ row.points }}
               </td>
             </tr>

@@ -80,8 +80,8 @@ const pinned = computed(() => isPinned(league.value?.id));
         <Button
           variant="ghost"
           size="icon"
-          class="size-6 shrink-0"
-          :class="pinned ? 'text-sky-600' : 'text-muted-foreground'"
+          class="size-7 shrink-0"
+          :class="pinned ? 'text-primary' : 'text-muted-foreground'"
           :aria-pressed="pinned"
           :aria-label="
             pinned ? `Lepas sematan ${league.name}` : `Sematkan ${league.name}`
@@ -107,7 +107,7 @@ const pinned = computed(() => isPinned(league.value?.id));
             <Info class="text-muted-foreground size-3.5" />
           </div>
           <p
-            class="text-muted-foreground mt-1 flex justify-between text-[11px] tabular-nums"
+            class="text-muted-foreground mt-1 flex justify-between text-[11px] font-score"
           >
             <span>{{ league.start }}</span>
             <span>{{ league.end }}</span>
@@ -214,7 +214,7 @@ const pinned = computed(() => isPinned(league.value?.id));
         </TableHeader>
         <TableBody>
           <TableRow v-for="season in league.archive" :key="season.season">
-            <TableCell class="text-muted-foreground pl-4 tabular-nums">
+            <TableCell class="text-muted-foreground pl-4 font-score">
               {{ season.season }}
             </TableCell>
             <TableCell class="font-semibold">{{ season.winner }}</TableCell>
@@ -226,4 +226,7 @@ const pinned = computed(() => isPinned(league.value?.id));
       </Table>
     </SectionCard>
   </div>
+  <SectionCard v-else card="memuat">
+    <SkeletonRows :rows="8" />
+  </SectionCard>
 </template>

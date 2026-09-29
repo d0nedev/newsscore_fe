@@ -44,22 +44,22 @@ const label = {
                 :to="`/pemain/${player.id}`"
                 class="hover:text-primary flex items-center gap-2"
               >
-                <span class="text-muted-foreground w-5 tabular-nums">{{
+                <span class="text-muted-foreground w-5 font-score">{{
                   player.number
                 }}</span>
                 <span class="truncate font-semibold">{{ player.name }}</span>
               </NuxtLink>
             </TableCell>
-            <TableCell class="text-center tabular-nums">{{
+            <TableCell class="text-center font-score">{{
               player.age
             }}</TableCell>
-            <TableCell class="text-center tabular-nums">{{
+            <TableCell class="text-center font-score">{{
               player.matches
             }}</TableCell>
-            <TableCell class="text-center font-semibold tabular-nums">{{
+            <TableCell class="text-center font-semibold font-score">{{
               player.goals
             }}</TableCell>
-            <TableCell class="pr-4 text-center tabular-nums">{{
+            <TableCell class="pr-4 text-center font-score">{{
               player.assists
             }}</TableCell>
           </TableRow>

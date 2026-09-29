@@ -74,7 +74,7 @@ const total = computed(() =>
       </TableHeader>
       <TableBody>
         <TableRow v-for="row in visible" :key="row.season + row.competition">
-          <TableCell class="text-muted-foreground pl-4 tabular-nums">
+          <TableCell class="text-muted-foreground pl-4 font-score">
             {{ row.season }}
           </TableCell>
           <TableCell>
@@ -97,27 +97,25 @@ const total = computed(() =>
           <TableCell class="text-center">
             <RatingBadge :rating="row.rating" />
           </TableCell>
-          <TableCell class="text-center tabular-nums">{{ row.apps }}</TableCell>
+          <TableCell class="text-center font-score">{{ row.apps }}</TableCell>
           <template v-if="goalkeeper">
-            <TableCell class="text-center tabular-nums">
+            <TableCell class="text-center font-score">
               {{ row.savePct?.toFixed(1) ?? "-" }}
             </TableCell>
-            <TableCell class="text-center font-semibold tabular-nums">
+            <TableCell class="text-center font-semibold font-score">
               {{ row.cleanSheets ?? 0 }}
             </TableCell>
           </template>
           <template v-else>
-            <TableCell class="text-center font-semibold tabular-nums">
+            <TableCell class="text-center font-semibold font-score">
               {{ row.goals ?? 0 }}
             </TableCell>
-            <TableCell class="text-center tabular-nums">
+            <TableCell class="text-center font-score">
               {{ row.assists ?? 0 }}
             </TableCell>
           </template>
-          <TableCell class="text-center tabular-nums">{{
-            row.yellow
-          }}</TableCell>
-          <TableCell class="pr-4 text-center tabular-nums">{{
+          <TableCell class="text-center font-score">{{ row.yellow }}</TableCell>
+          <TableCell class="pr-4 text-center font-score">{{
             row.red
           }}</TableCell>
         </TableRow>
@@ -126,27 +124,25 @@ const total = computed(() =>
           <TableCell class="pl-4 text-xs uppercase" colspan="4"
             >Total</TableCell
           >
-          <TableCell class="text-center tabular-nums">{{
-            total.apps
-          }}</TableCell>
+          <TableCell class="text-center font-score">{{ total.apps }}</TableCell>
           <template v-if="goalkeeper">
             <TableCell class="text-muted-foreground text-center">-</TableCell>
-            <TableCell class="text-center tabular-nums">{{
+            <TableCell class="text-center font-score">{{
               total.cleanSheets
             }}</TableCell>
           </template>
           <template v-else>
-            <TableCell class="text-center tabular-nums">{{
+            <TableCell class="text-center font-score">{{
               total.goals
             }}</TableCell>
-            <TableCell class="text-center tabular-nums">{{
+            <TableCell class="text-center font-score">{{
               total.assists
             }}</TableCell>
           </template>
-          <TableCell class="text-center tabular-nums">{{
+          <TableCell class="text-center font-score">{{
             total.yellow
           }}</TableCell>
-          <TableCell class="pr-4 text-center tabular-nums">{{
+          <TableCell class="pr-4 text-center font-score">{{
             total.red
           }}</TableCell>
         </TableRow>

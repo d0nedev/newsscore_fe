@@ -20,7 +20,7 @@ defineProps<{ transfers: TeamTransfer[] }>();
         v-for="transfer in transfers"
         :key="transfer.date + transfer.player"
       >
-        <TableCell class="text-muted-foreground pl-4 tabular-nums">
+        <TableCell class="text-muted-foreground pl-4 font-score">
           {{ transfer.date }}
         </TableCell>
         <TableCell>
@@ -29,7 +29,7 @@ defineProps<{ transfers: TeamTransfer[] }>();
               class="size-3.5 shrink-0"
               :class="
                 transfer.direction === 'in'
-                  ? 'text-emerald-600'
+                  ? 'text-win'
                   : 'text-destructive rotate-180'
               "
               :aria-label="transfer.direction === 'in' ? 'Masuk' : 'Keluar'"

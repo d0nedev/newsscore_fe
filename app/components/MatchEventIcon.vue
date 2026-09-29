@@ -21,7 +21,7 @@ const labels: Record<MatchEvent["type"], string> = {
   />
   <ArrowLeftRight
     v-else-if="type === 'sub'"
-    class="size-4 shrink-0 text-emerald-600"
+    class="size-4 shrink-0 text-win"
     role="img"
     :aria-label="labels.sub"
   />

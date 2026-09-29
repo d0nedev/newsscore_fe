@@ -38,13 +38,13 @@ const rows = computed(() =>
             >{{ match.date }} &middot; {{ match.time }}</span
           >
         </TableCell>
-        <TableCell class="text-right tabular-nums">{{
+        <TableCell class="text-right font-score">{{
           odds.home.toFixed(2)
         }}</TableCell>
-        <TableCell class="text-right tabular-nums">{{
+        <TableCell class="text-right font-score">{{
           odds.draw.toFixed(2)
         }}</TableCell>
-        <TableCell class="pr-4 text-right tabular-nums">{{
+        <TableCell class="pr-4 text-right font-score">{{
           odds.away.toFixed(2)
         }}</TableCell>
       </TableRow>

@@ -12,14 +12,14 @@ const goals = (side: "home" | "away") =>
 
 <template>
   <section
-    class="relative overflow-hidden rounded-lg bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-5 text-white"
+    class="relative overflow-hidden rounded-lg bg-header text-header-foreground p-5"
   >
     <div class="mb-4 flex items-center justify-between text-xs">
       <Badge v-if="match.status === 'live'" class="rounded-sm font-bold">
         LIVE SEKARANG
       </Badge>
-      <span v-else class="text-white/60">{{ match.date }}</span>
-      <span class="text-white/60">
+      <span v-else class="text-header-foreground/60">{{ match.date }}</span>
+      <span class="text-header-foreground/60">
         {{ league }}<template v-if="match.round"> · {{ match.round }}</template>
       </span>
     </div>
@@ -40,12 +40,14 @@ const goals = (side: "home" | "away") =>
         />
         <span
           v-else
-          class="mx-auto mb-2 grid size-12 place-items-center rounded-full bg-white/10 text-base font-bold"
+          class="mx-auto mb-2 grid size-12 place-items-center rounded-full bg-header-foreground/10 text-base font-bold"
           aria-hidden="true"
           >{{ match[side].badge }}</span
         >
-        <h2 class="text-xl font-bold sm:text-2xl">{{ match[side].name }}</h2>
-        <ul class="mt-2 space-y-0.5 text-xs text-white/60">
+        <p class="font-heading text-xl font-bold sm:text-2xl">
+          {{ match[side].name }}
+        </p>
+        <ul class="mt-2 space-y-0.5 text-xs text-header-foreground/60">
           <li v-for="(goal, i) in goals(side)" :key="i">
             {{ goal.minute }}' {{ goal.player }}
           </li>
@@ -57,14 +59,14 @@ const goals = (side: "home" | "away") =>
           <span
             v-for="(value, i) in match.score ?? ['-', '-']"
             :key="i"
-            class="grid size-12 place-items-center rounded-md bg-white/10 text-2xl font-bold tabular-nums"
+            class="grid size-12 place-items-center rounded-md bg-header-foreground/10 text-2xl font-bold font-score"
             >{{ value }}</span
           >
         </p>
         <p class="mt-2 text-sm font-semibold">
           {{ match.status === "finished" ? "Selesai" : match.time }}
         </p>
-        <p v-if="match.halfTime" class="text-xs text-white/60">
+        <p v-if="match.halfTime" class="text-xs text-header-foreground/60">
           Babak 1: {{ match.halfTime[0] }} - {{ match.halfTime[1] }}
         </p>
       </div>

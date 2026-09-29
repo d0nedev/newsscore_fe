@@ -8,7 +8,8 @@ const props = defineProps<{
   perspectiveTeamId?: string;
 }>();
 
-const starred = ref(false);
+const followed = useFollowed("match");
+const starred = computed(() => followed.isFollowed(props.match.id));
 
 // Live shows its marker; everything else shows play date and kick-off time.
 const day = computed(() =>
@@ -44,15 +45,15 @@ const outcome = computed(() => {
 </script>
 
 <template>
-  <div class="hover:bg-muted/60 flex items-stretch text-sm">
+  <div class="hover:bg-muted/60 flex transition-colors items-stretch text-sm">
     <Button
       variant="ghost"
       size="icon"
-      class="my-auto ml-1 size-6 shrink-0"
+      class="my-auto ml-1 size-7 shrink-0"
       :class="starred ? 'text-primary' : 'text-muted-foreground/50'"
       :aria-pressed="starred"
       :aria-label="`Ikuti ${match.home.name} - ${match.away.name}`"
-      @click="starred = !starred"
+      @click="followed.toggle(match.id)"
     >
       <Star :fill="starred ? 'currentColor' : 'none'" />
     </Button>
@@ -69,8 +70,8 @@ const outcome = computed(() => {
             : 'text-muted-foreground'
         "
       >
-        <span v-if="day" class="block tabular-nums">{{ day }}</span>
-        <span class="block tabular-nums">{{ match.time }}</span>
+        <span v-if="day" class="block font-score">{{ day }}</span>
+        <span class="block font-score">{{ match.time }}</span>
       </span>
 
       <span class="min-w-0 flex-1 space-y-1">
@@ -88,7 +89,7 @@ const outcome = computed(() => {
 
     <!-- Score and odds sit in their own bordered columns, like a results grid. -->
     <p
-      class="grid w-16 shrink-0 content-center gap-1 border-l px-3 py-2 text-left font-bold tabular-nums"
+      class="grid w-16 shrink-0 content-center gap-1 border-l px-3 py-2 text-left font-bold font-score"
       :class="match.status === 'live' ? 'text-primary' : ''"
     >
       <template v-if="match.score">
@@ -110,7 +111,7 @@ const outcome = computed(() => {
       v-else
       class="text-muted-foreground hidden w-32 shrink-0 content-center border-l px-3 text-xs sm:grid"
     >
-      <span v-if="match.odds?.[0]" class="flex justify-between tabular-nums">
+      <span v-if="match.odds?.[0]" class="flex justify-between font-score">
         <span>{{ match.odds[0].home.toFixed(2) }}</span>
         <span>{{ match.odds[0].draw.toFixed(2) }}</span>
         <span>{{ match.odds[0].away.toFixed(2) }}</span>

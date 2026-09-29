@@ -21,7 +21,7 @@ defineProps<{ transfers: PlayerProfile["transfers"] }>();
         v-for="transfer in transfers"
         :key="transfer.season + transfer.to"
       >
-        <TableCell class="text-muted-foreground pl-4 tabular-nums">
+        <TableCell class="text-muted-foreground pl-4 font-score">
           {{ transfer.date ?? transfer.season }}
         </TableCell>
         <TableCell>
@@ -34,7 +34,7 @@ defineProps<{ transfers: PlayerProfile["transfers"] }>();
           <span
             class="text-muted-foreground flex items-center gap-2 text-xs uppercase"
           >
-            <ArrowRight class="size-3.5 shrink-0 text-emerald-600" />
+            <ArrowRight class="size-3.5 shrink-0 text-win" />
             {{ transfer.type ?? "Transfer" }}
           </span>
         </TableCell>
@@ -44,7 +44,7 @@ defineProps<{ transfers: PlayerProfile["transfers"] }>();
             <span class="truncate">{{ transfer.to }}</span>
           </span>
         </TableCell>
-        <TableCell class="text-muted-foreground pr-4 text-right tabular-nums">
+        <TableCell class="text-muted-foreground pr-4 text-right font-score">
           {{ transfer.fee }}
         </TableCell>
       </TableRow>

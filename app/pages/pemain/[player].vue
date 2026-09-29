@@ -91,7 +91,7 @@ const followed = ref(false);
         <Button
           variant="ghost"
           size="icon"
-          class="size-6 shrink-0"
+          class="size-7 shrink-0"
           :class="followed ? 'text-primary' : 'text-muted-foreground'"
           :aria-pressed="followed"
           :aria-label="`Ikuti ${name}`"
@@ -112,7 +112,7 @@ const followed = ref(false);
           </template>
         </p>
         <MetaLine label="Usia">
-          <span class="tabular-nums">{{ age }}</span>
+          <span class="font-score">{{ age }}</span>
           <template v-if="player?.birthDate">
             ({{ player.birthDate }})</template
           >
@@ -155,7 +155,7 @@ const followed = ref(false);
             class="bg-muted/50 rounded-md p-3 text-center"
           >
             <p class="text-muted-foreground text-xs">{{ stat.label }}</p>
-            <p class="text-lg font-semibold tabular-nums">{{ stat.value }}</p>
+            <p class="text-lg font-semibold font-score">{{ stat.value }}</p>
           </div>
         </div>
       </SectionCard>
@@ -228,4 +228,7 @@ const followed = ref(false);
       <PlayerInjuries :injuries="injuries" />
     </SectionCard>
   </div>
+  <SectionCard v-else card="memuat">
+    <SkeletonRows :rows="8" />
+  </SectionCard>
 </template>

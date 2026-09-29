@@ -13,7 +13,10 @@ const props = defineProps<{
 }>();
 
 const open = ref(true);
-const starred = ref(false);
+// Competitions without an id (e.g. a team's fixtures) star by their title.
+const followed = useFollowed("competition");
+const followKey = computed(() => props.leagueId ?? props.title ?? "");
+const starred = computed(() => followed.isFollowed(followKey.value));
 
 // A section header only offers a pin when it stands for a real competition.
 const { isPinned, toggle } = usePinnedLeagues();
@@ -29,11 +32,11 @@ const pinned = computed(() => isPinned(props.leagueId));
       <Button
         variant="ghost"
         size="icon"
-        class="size-6"
+        class="size-7"
         :class="starred ? 'text-primary' : 'text-muted-foreground'"
         :aria-pressed="starred"
         :aria-label="`Ikuti ${title}`"
-        @click="starred = !starred"
+        @click="followed.toggle(followKey)"
       >
         <Star :fill="starred ? 'currentColor' : 'none'" />
       </Button>
@@ -46,8 +49,8 @@ const pinned = computed(() => isPinned(props.leagueId));
         v-if="leagueId"
         variant="ghost"
         size="icon"
-        class="size-6 shrink-0"
-        :class="pinned ? 'text-sky-600' : 'text-muted-foreground'"
+        class="size-7 shrink-0"
+        :class="pinned ? 'text-primary' : 'text-muted-foreground'"
         :aria-pressed="pinned"
         :aria-label="pinned ? `Lepas sematan ${title}` : `Sematkan ${title}`"
         @click="toggle(leagueId)"
@@ -63,7 +66,7 @@ const pinned = computed(() => isPinned(props.leagueId));
       <Button
         variant="ghost"
         size="icon"
-        class="text-muted-foreground size-6"
+        class="text-muted-foreground size-7"
         :class="leagueId ? '' : 'ml-auto'"
         :aria-expanded="open"
         :aria-label="open ? 'Sembunyikan' : 'Tampilkan'"

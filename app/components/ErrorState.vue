@@ -11,7 +11,9 @@ defineEmits<{ retry: [] }>();
     <AlertTitle>Terjadi kesalahan</AlertTitle>
     <AlertDescription>{{ errorMessage(error) }}</AlertDescription>
     <AlertAction>
-      <Button size="sm" variant="outline" @click="$emit('retry')">Retry</Button>
+      <Button size="sm" variant="outline" @click="$emit('retry')"
+        >Coba lagi</Button
+      >
     </AlertAction>
   </Alert>
 </template>

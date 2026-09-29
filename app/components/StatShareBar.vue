@@ -15,7 +15,7 @@ const share = (side: "home" | "away") => {
     </span>
     <span class="bg-muted flex flex-1">
       <span
-        class="block bg-slate-700"
+        class="bg-foreground/70 block"
         :style="{ width: `${share('away')}%` }"
       />
     </span>

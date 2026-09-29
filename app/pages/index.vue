@@ -35,6 +35,7 @@ const leagueName = (id: string) => findLeague(id)?.name ?? "";
 
 <template>
   <div class="space-y-4">
+    <h1 class="sr-only">Skor langsung sepak bola</h1>
     <FeaturedMatch
       v-if="featured"
       :match="featured"
@@ -71,6 +72,7 @@ const leagueName = (id: string) => findLeague(id)?.name ?? "";
         />
       </div>
 
+      <SkeletonRows v-if="matchesQuery.isPending.value" class="border-t" />
       <ul aria-label="Pertandingan hari ini" class="divide-y border-t">
         <li v-for="match in shownMatches" :key="match.id">
           <MatchCardRow :match="match" :league="leagueName(match.leagueId)" />

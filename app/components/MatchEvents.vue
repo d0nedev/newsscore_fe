@@ -53,7 +53,7 @@ const halves = computed(() => {
         class="bg-muted text-muted-foreground mb-1 flex items-center justify-between px-4 py-2 text-xs font-semibold uppercase"
       >
         <span>{{ half.label }}</span>
-        <span class="text-foreground tabular-nums">{{ half.score }}</span>
+        <span class="text-foreground font-score">{{ half.score }}</span>
       </p>
       <ul class="space-y-1">
         <MatchEventRow

@@ -50,14 +50,20 @@ const crumbs = computed(() => [
           to: `/negara/${slugify(league.value.country)}`,
         },
         {
-          label: `${league.value.name} - ${match.value?.round ?? ""}`,
+          label: [league.value.name, match.value?.round]
+            .filter(Boolean)
+            .join(" - "),
           to: `/sepak-bola/${league.value.id}`,
         },
       ]
     : []),
 ]);
 
-const starred = ref({ home: false, away: false });
+const followedTeams = useFollowed("team");
+const starred = computed(() => ({
+  home: !!match.value && followedTeams.isFollowed(match.value.home.id),
+  away: !!match.value && followedTeams.isFollowed(match.value.away.id),
+}));
 
 const headerCardId = useCardId("papan-skor");
 </script>
@@ -97,7 +103,7 @@ const headerCardId = useCardId("papan-skor");
             ]"
             :aria-pressed="starred[side]"
             :aria-label="`Ikuti ${match[side].name}`"
-            @click="starred[side] = !starred[side]"
+            @click="followedTeams.toggle(match[side].id)"
           >
             <Star :fill="starred[side] ? 'currentColor' : 'none'" />
           </Button>
@@ -117,7 +123,7 @@ const headerCardId = useCardId("papan-skor");
             <span v-if="match.status === 'scheduled'">{{ match.time }}</span>
           </p>
           <p
-            class="text-4xl font-extrabold tabular-nums"
+            class="text-4xl font-extrabold font-score"
             :class="match.status === 'live' ? 'text-primary' : ''"
           >
             <template v-if="match.score">
@@ -230,10 +236,9 @@ const headerCardId = useCardId("papan-skor");
                 :key="player.number"
                 class="flex gap-2"
               >
-                <span
-                  class="text-muted-foreground w-6 text-right tabular-nums"
-                  >{{ player.number }}</span
-                >
+                <span class="text-muted-foreground w-6 text-right font-score">{{
+                  player.number
+                }}</span>
                 <NuxtLink
                   v-if="player.playerId"
                   :to="`/pemain/${player.playerId}`"
@@ -280,13 +285,13 @@ const headerCardId = useCardId("papan-skor");
               <TableCell class="text-right">
                 <RatingBadge :rating="row.rating" />
               </TableCell>
-              <TableCell class="text-right tabular-nums">{{
+              <TableCell class="text-right font-score">{{
                 row.goals
               }}</TableCell>
-              <TableCell class="text-right tabular-nums">{{
+              <TableCell class="text-right font-score">{{
                 row.assists
               }}</TableCell>
-              <TableCell class="text-right tabular-nums">{{
+              <TableCell class="text-right font-score">{{
                 row.shots
               }}</TableCell>
             </TableRow>
@@ -302,7 +307,7 @@ const headerCardId = useCardId("papan-skor");
             class="flex gap-3 px-3 py-2"
             :class="line.highlight ? 'bg-accent font-medium' : ''"
           >
-            <span class="text-muted-foreground w-10 shrink-0 tabular-nums">{{
+            <span class="text-muted-foreground w-10 shrink-0 font-score">{{
               line.minute
             }}</span>
             <span class="flex-1">{{ line.text }}</span>
@@ -324,11 +329,11 @@ const headerCardId = useCardId("papan-skor");
           :key="game.date"
           class="flex items-center gap-3 px-3 py-2"
         >
-          <span class="text-muted-foreground w-24 shrink-0 tabular-nums">{{
+          <span class="text-muted-foreground w-24 shrink-0 font-score">{{
             game.date
           }}</span>
           <span class="flex-1">{{ game.label }}</span>
-          <span class="font-semibold tabular-nums">{{ game.score }}</span>
+          <span class="font-semibold font-score">{{ game.score }}</span>
         </li>
       </ul>
     </SectionCard>
@@ -349,13 +354,13 @@ const headerCardId = useCardId("papan-skor");
         <TableBody>
           <TableRow v-for="row in match.odds" :key="row.bookmaker">
             <TableCell>{{ row.bookmaker }}</TableCell>
-            <TableCell class="text-right tabular-nums">{{
+            <TableCell class="text-right font-score">{{
               row.home.toFixed(2)
             }}</TableCell>
-            <TableCell class="text-right tabular-nums">{{
+            <TableCell class="text-right font-score">{{
               row.draw.toFixed(2)
             }}</TableCell>
-            <TableCell class="text-right tabular-nums">{{
+            <TableCell class="text-right font-score">{{
               row.away.toFixed(2)
             }}</TableCell>
           </TableRow>
@@ -365,4 +370,7 @@ const headerCardId = useCardId("papan-skor");
 
     <NewsList v-if="mainTab === 'Berita'" :items="news ?? []" />
   </div>
+  <SectionCard v-else card="memuat">
+    <SkeletonRows :rows="8" />
+  </SectionCard>
 </template>

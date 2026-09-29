@@ -24,7 +24,7 @@ defineProps<{ entries: PlayerMatchLogEntry[]; goalkeeper?: boolean }>();
     </TableHeader>
     <TableBody>
       <TableRow v-for="entry in entries" :key="entry.date + entry.home">
-        <TableCell class="text-muted-foreground pl-4 tabular-nums">
+        <TableCell class="text-muted-foreground pl-4 font-score">
           {{ entry.date }}
         </TableCell>
         <TableCell>
@@ -44,7 +44,7 @@ defineProps<{ entries: PlayerMatchLogEntry[]; goalkeeper?: boolean }>();
             <span class="block truncate">{{ entry.away }}</span>
           </component>
         </TableCell>
-        <TableCell class="text-center leading-tight font-bold tabular-nums">
+        <TableCell class="text-center leading-tight font-bold font-score">
           <span class="block">{{ entry.score[0] }}</span>
           <span class="block">{{ entry.score[1] }}</span>
         </TableCell>
@@ -61,16 +61,16 @@ defineProps<{ entries: PlayerMatchLogEntry[]; goalkeeper?: boolean }>();
           <TableCell class="text-center">
             <RatingBadge :rating="entry.rating" />
           </TableCell>
-          <TableCell class="text-muted-foreground text-center tabular-nums">
+          <TableCell class="text-muted-foreground text-center font-score">
             <template v-if="entry.minutes">{{ entry.minutes }}'</template>
           </TableCell>
-          <TableCell class="text-center tabular-nums">
+          <TableCell class="text-center font-score">
             {{ entry.detail ?? "-" }}
           </TableCell>
-          <TableCell class="text-center tabular-nums">
+          <TableCell class="text-center font-score">
             {{ entry.yellow || 0 }}
           </TableCell>
-          <TableCell class="text-center tabular-nums">
+          <TableCell class="text-center font-score">
             {{ entry.red || 0 }}
           </TableCell>
         </template>

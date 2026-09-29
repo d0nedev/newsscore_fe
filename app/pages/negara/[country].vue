@@ -65,4 +65,7 @@ const cardId = useCardId("pertandingan");
       />
     </Card>
   </div>
+  <SectionCard v-else card="memuat">
+    <SkeletonRows :rows="8" />
+  </SectionCard>
 </template>

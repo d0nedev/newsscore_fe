@@ -14,7 +14,7 @@ defineProps<{ items: NewsItem[] }>();
       <li
         v-for="item in items"
         :key="item.id"
-        class="hover:bg-muted/60 flex gap-3 p-4"
+        class="hover:bg-muted/60 flex gap-3 p-4 transition-colors"
       >
         <!-- Placeholder thumbnail: the slice ships no images. -->
         <span
