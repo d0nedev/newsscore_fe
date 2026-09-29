@@ -14,31 +14,21 @@ const view = ref<string>(views[0]);
 
 const matchesQuery = useMatches(matchWindow());
 
-// One block per competition in this country, each keeping its own header bar.
+// One block per competition in this country, each keeping its own header bar,
+// even without matches in the window.
 const blocks = computed(() => {
   if (!country.value) return [];
-  return comps
-    .byCountry(country.value)
-    .map((competition) => {
-      const all = (matchesQuery.data.value ?? []).filter(
-        (match) => match.leagueId === competition.id,
-      );
-      const matches =
-        view.value === "Jadwal"
-          ? all.filter((match) => match.status === "scheduled")
-          : all.filter((match) => match.status !== "scheduled");
-      return { competition, matches };
-    })
-    .filter((block) => block.matches.length > 0);
+  return comps.byCountry(country.value).map((competition) => {
+    const all = (matchesQuery.data.value ?? []).filter(
+      (match) => match.leagueId === competition.id,
+    );
+    const matches =
+      view.value === "Jadwal"
+        ? all.filter((match) => match.status === "scheduled")
+        : all.filter((match) => match.status !== "scheduled");
+    return { competition, matches };
+  });
 });
-
-const empty = computed(() =>
-  blocks.value.length
-    ? undefined
-    : view.value === "Jadwal"
-      ? "Belum ada jadwal untuk negara ini."
-      : "Belum ada hasil untuk negara ini.",
-);
 
 const cardId = useCardId("pertandingan");
 </script>
@@ -61,8 +51,6 @@ const cardId = useCardId("pertandingan");
       <div class="p-3">
         <PillTabs v-model="view" :items="views" aria-label="Tampilan skor" />
       </div>
-
-      <p v-if="empty" class="text-muted-foreground p-4 text-sm">{{ empty }}</p>
 
       <MatchList
         v-for="block in blocks"
