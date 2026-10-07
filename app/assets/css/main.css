@@ -112,6 +112,10 @@
     transition-property: color, background-color, border-color, opacity;
     transition-duration: 150ms;
   }
+  /* A 1px press on every enabled button, shadcn ones included. */
+  button:not(:disabled):active {
+    transform: translateY(1px);
+  }
   html {
     /* Always reserve the scrollbar so short and long pages line up the same. */
     overflow-y: scroll;

@@ -112,6 +112,18 @@ test("a starred match stays starred after navigating away", async ({
   await expect(star).toHaveAttribute("aria-pressed", "true");
 });
 
+test("skip link is the first tab stop and jumps to the content", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const skip = page.getByRole("link", { name: "Lewati ke konten" });
+  await expect(skip).toBeAttached(); // client-rendered: wait for mount
+  await page.keyboard.press("Tab");
+  await expect(skip).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#konten")).toBeFocused();
+});
+
 test("unknown match shows not found", async ({ page }) => {
   await page.goto("/pertandingan/nope");
   await expect(page.getByText("Pertandingan tidak ditemukan.")).toBeVisible();

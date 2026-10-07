@@ -42,14 +42,7 @@ const leagueName = (id: string) => findLeague(id)?.name ?? "";
       :league="leagueName(featured.leagueId)"
     />
 
-    <SectionCard
-      title="Pertandingan Hari Ini"
-      :empty="
-        shownMatches.length || matchesQuery.isPending.value
-          ? undefined
-          : 'Tidak ada pertandingan pada filter ini.'
-      "
-    >
+    <SectionCard title="Pertandingan Hari Ini">
       <template #action>
         <span class="text-muted-foreground text-xs">{{ matchCount }}</span>
       </template>
@@ -78,6 +71,21 @@ const leagueName = (id: string) => findLeague(id)?.name ?? "";
           <MatchCardRow :match="match" :league="leagueName(match.leagueId)" />
         </li>
       </ul>
+      <!-- Below the filter and date bar, so an empty day can still be left. -->
+      <p
+        v-if="
+          !shownMatches.length &&
+          !matchesQuery.isPending.value &&
+          !matchesQuery.error.value
+        "
+        class="text-muted-foreground p-4 text-sm"
+      >
+        {{
+          onDate.length
+            ? "Tidak ada pertandingan pada filter ini."
+            : "Tidak ada pertandingan pada tanggal ini."
+        }}
+      </p>
 
       <div v-if="leagues[0]" class="border-t p-2 text-center">
         <Button

@@ -45,6 +45,11 @@ const showAdSlots = import.meta.dev;
 
 <template>
   <div class="bg-muted text-foreground flex min-h-dvh flex-col">
+    <a
+      href="#konten"
+      class="bg-background text-foreground sr-only z-50 rounded px-3 py-2 text-sm font-semibold focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+      >Lewati ke konten</a
+    >
     <header class="bg-header text-header-foreground">
       <div class="mx-auto flex max-w-[1240px] items-center gap-2 px-4 py-5">
         <NuxtLink to="/" class="text-2xl font-extrabold tracking-tight">
@@ -136,7 +141,7 @@ const showAdSlots = import.meta.dev;
         <AppSidebar />
       </aside>
 
-      <main class="min-w-0 flex-1">
+      <main id="konten" tabindex="-1" class="min-w-0 flex-1 outline-none">
         <slot />
       </main>
 
