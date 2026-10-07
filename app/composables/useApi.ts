@@ -411,10 +411,35 @@ export function useMatch(id: MaybeRefOrGetter<string>) {
   });
 }
 
+const teamQuery = (id: string) => ({
+  queryKey: ["team", id],
+  queryFn: () => get<ApiTeamProfile>(`/teams/${id}`).then(toTeam),
+});
+
 export function useTeam(id: MaybeRefOrGetter<string>) {
+  return useQuery(computed(() => teamQuery(toValue(id))));
+}
+
+/** Several team profiles, in the given order; teams still loading are left out. */
+export function useTeams(ids: MaybeRefOrGetter<string[]>) {
+  return useQueries({
+    queries: computed(() =>
+      toValue(ids).map((id) => ({ ...teamQuery(id), staleTime: 5 * 60_000 })),
+    ),
+    combine: (results) => results.flatMap((r) => (r.data ? [r.data] : [])),
+  });
+}
+
+/** Teams whose name matches q (GET /search); idle below two characters. */
+export function useTeamSearch(q: MaybeRefOrGetter<string>) {
   return useQuery({
-    queryKey: ["team", id],
-    queryFn: () => get<ApiTeamProfile>(`/teams/${toValue(id)}`).then(toTeam),
+    queryKey: ["search", q],
+    queryFn: () =>
+      get<{ teams: Team[] }>("/search", { q: toValue(q) }).then((r) =>
+        r.teams.map(withLogo),
+      ),
+    enabled: () => toValue(q).trim().length >= 2,
+    staleTime: 60_000,
   });
 }
 

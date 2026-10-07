@@ -68,7 +68,10 @@ const transferPreview = computed(() =>
     : transfers.value.slice(0, TRANSFER_PREVIEW),
 );
 
-const followed = ref(false);
+const followedTeams = useFollowed("team");
+const followed = computed(
+  () => !!team.value && followedTeams.isFollowed(team.value.id),
+);
 const capacity = new Intl.NumberFormat("id-ID");
 </script>
 
@@ -98,7 +101,7 @@ const capacity = new Intl.NumberFormat("id-ID");
           :class="followed ? 'text-primary' : 'text-muted-foreground'"
           :aria-pressed="followed"
           :aria-label="`Ikuti ${team.name}`"
-          @click="followed = !followed"
+          @click="followedTeams.toggle(team.id)"
         >
           <Star :fill="followed ? 'currentColor' : 'none'" />
         </Button>

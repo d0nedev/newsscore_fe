@@ -15,5 +15,5 @@ export function useFollowed(kind: "match" | "team" | "competition") {
       : [...ids.value, id];
   };
 
-  return { isFollowed, toggle };
+  return { ids, isFollowed, toggle };
 }
