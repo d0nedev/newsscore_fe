@@ -3,7 +3,7 @@ import { Pin, Plus, Star } from "@lucide/vue";
 import { slugify } from "~/utils/slug";
 
 const { pinnedLeagues } = usePinnedLeagues();
-const { leagues, countries } = useCompetitions();
+const { competitions, countries } = useCompetitions();
 const followedTeams = ["Jerman", "Chelsea"];
 </script>
 
@@ -41,7 +41,7 @@ const followedTeams = ["Jerman", "Chelsea"];
         Kompetisi
       </h2>
       <ul class="py-1 text-sm">
-        <li v-for="league in leagues" :key="league.id">
+        <li v-for="league in competitions" :key="league.id">
           <NuxtLink
             :to="`/sepak-bola/${league.id}`"
             class="hover:text-primary flex items-center gap-2 py-1.5"

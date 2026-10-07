@@ -64,6 +64,8 @@ interface ApiMatchDetail extends ApiMatch {
   stats: { label: string; home: string; away: string }[];
 }
 
+type ApiStandingRow = StandingRow & { badge: string; logo?: string };
+
 interface ApiLeague {
   id: string;
   name: string;
@@ -72,7 +74,9 @@ interface ApiLeague {
   /** 0 until a match is stored. */
   season: number;
   /** Only on GET /leagues/{id}. */
-  standings?: (StandingRow & { badge: string; logo?: string })[];
+  standings?: ApiStandingRow[];
+  /** Cups only, on GET /leagues/{id}. */
+  groups?: { name: string; standings: ApiStandingRow[] }[];
 }
 
 interface ApiTeamProfile extends Team {
@@ -112,6 +116,7 @@ interface ApiPlayerProfile {
   matchLog: {
     date: string;
     matchId?: string;
+    league?: string;
     home: string;
     away: string;
     score: Score;
@@ -166,12 +171,15 @@ const toMatchDetail = (m: ApiMatchDetail): Match => ({
       assist: e.assist,
       note: e.note,
     })),
-  stats: m.stats.map((s) => ({
-    label: s.label,
-    home: Number.parseFloat(s.home) || 0,
-    away: Number.parseFloat(s.away) || 0,
-    percent: s.home.endsWith("%") || s.away.endsWith("%"),
-  })),
+  // The source repeats each label per period after the full-match block; keep the first.
+  stats: m.stats
+    .filter((s, i) => m.stats.findIndex((o) => o.label === s.label) === i)
+    .map((s) => ({
+      label: s.label,
+      home: Number.parseFloat(s.home) || 0,
+      away: Number.parseFloat(s.away) || 0,
+      percent: s.home.endsWith("%") || s.away.endsWith("%"),
+    })),
   lineups: {
     home: (m.lineups.home ?? []).filter((p) => p.starter).map(toLineup),
     away: (m.lineups.away ?? []).filter((p) => p.starter).map(toLineup),
@@ -185,6 +193,10 @@ const toLeague = (l: ApiLeague): League => ({
   type: l.type,
   season: l.season ? String(l.season) : "",
   standings: (l.standings ?? []).map(withLogo),
+  groups: (l.groups ?? []).map((g) => ({
+    name: g.name,
+    standings: g.standings.map(withLogo),
+  })),
   archive: [],
 });
 
@@ -235,8 +247,7 @@ const toPlayer = (p: ApiPlayerProfile): PlayerProfile => ({
     .filter((e) => e.score && e.outcome)
     .map((e): PlayerMatchLogEntry => ({
       date: e.date.replace(/\.\d{2}(\d{2})$/, ".$1"), // DD.MM.YYYY -> DD.MM.YY
-      // The log names no competition.
-      competition: "",
+      competition: e.league ?? "",
       country: "",
       matchId: e.matchId,
       home: e.home,
@@ -361,6 +372,32 @@ export function useMatches(
     enabled,
     refetchInterval: (query) =>
       query.state.data?.some((m) => m.status === "live") ? 30_000 : false,
+  });
+}
+
+/** Matches of the latest 31-day stretch before matchWindow() that has any, up to a year back. */
+export function useEarlierMatches(
+  leagueId: MaybeRefOrGetter<string>,
+  enabled: MaybeRefOrGetter<boolean> = true,
+) {
+  return useQuery({
+    queryKey: ["earlier-matches", leagueId],
+    queryFn: async () => {
+      const start = Date.now() - 16 * DAY;
+      // ponytail: up to 12 sequential requests for a dormant competition; a "last match date" on /leagues/{id} would make it one.
+      for (let k = 0; k < 12; k++) {
+        const to = start - k * 31 * DAY;
+        const list = await get<ApiMatch[]>("/matches", {
+          leagueId: toValue(leagueId),
+          from: formatDate(to - 30 * DAY),
+          to: formatDate(to),
+        });
+        if (list.length) return list.map(toMatch);
+      }
+      return [];
+    },
+    enabled,
+    staleTime: 5 * 60_000,
   });
 }
 

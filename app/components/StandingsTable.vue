@@ -2,8 +2,14 @@
 import type { StandingRow } from "~/types/match";
 
 const props = withDefaults(
-  defineProps<{ rows: StandingRow[]; legend?: boolean; total?: number }>(),
-  { legend: true, total: undefined },
+  defineProps<{
+    rows: StandingRow[];
+    legend?: boolean;
+    total?: number;
+    /** Group name, shown above a cup group table. */
+    title?: string;
+  }>(),
+  { legend: true, total: undefined, title: undefined },
 );
 
 // Qualification zones are keyed off the full table size, so a sliced preview
@@ -11,6 +17,8 @@ const props = withDefaults(
 const size = computed(() => props.total ?? props.rows.length);
 
 const zone = (position: number) => {
+  // Zones only mean something next to their legend.
+  if (!props.legend) return null;
   if (position <= 4) return "champions";
   if (position === 5) return "europa";
   if (position > size.value - 3) return "relegation";
@@ -35,6 +43,7 @@ const cardId = useCardId("tabel-klasemen");
 <template>
   <Card :data-card="cardId" class="overflow-hidden py-0">
     <CardContent class="px-0">
+      <SubHeading v-if="title">{{ title }}</SubHeading>
       <Table class="text-sm">
         <TableHeader>
           <TableRow class="text-muted-foreground text-xs uppercase">

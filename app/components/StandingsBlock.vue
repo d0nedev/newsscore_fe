@@ -27,14 +27,28 @@ const rows = computed(() =>
       >
     </div>
 
+    <template v-if="league.groups?.length">
+      <StandingsTable
+        v-for="group in league.groups"
+        :key="group.name"
+        :title="group.name"
+        :rows="group.standings"
+        :legend="false"
+      />
+    </template>
+
     <PillTabs
-      v-if="matches"
+      v-else-if="matches"
       v-model="scope"
       :items="scopes"
       fill
       label="Cakupan klasemen"
     />
 
-    <StandingsTable :rows="rows" :total="league.standings.length" />
+    <StandingsTable
+      v-if="league.standings.length"
+      :rows="rows"
+      :total="league.standings.length"
+    />
   </section>
 </template>

@@ -10,7 +10,9 @@ import {
   DialogTrigger,
 } from "reka-ui";
 
-const { leagues } = useCompetitions();
+const { byCountry } = useCompetitions();
+// Footer "Jelajahi" lists the home country's competitions.
+const indonesian = computed(() => byCountry("Indonesia"));
 
 // Below lg the sidebar lives in a drawer; close it once a link navigates.
 const menuOpen = ref(false);
@@ -186,7 +188,7 @@ const showAdSlots = import.meta.dev;
                 >Skor Langsung</NuxtLink
               >
             </li>
-            <li v-for="league in leagues" :key="league.id">
+            <li v-for="league in indonesian" :key="league.id">
               <NuxtLink
                 :to="`/sepak-bola/${league.id}`"
                 class="hover:text-primary"

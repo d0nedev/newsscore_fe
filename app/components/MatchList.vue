@@ -43,7 +43,13 @@ const pinned = computed(() => isPinned(props.leagueId));
       <CountryChip v-if="subtitle" :country="subtitle" />
       <h2 class="min-w-0 truncate font-bold">
         <span v-if="subtitle" class="uppercase">{{ subtitle }}:</span>
-        {{ title }}
+        <NuxtLink
+          v-if="leagueId"
+          :to="`/sepak-bola/${leagueId}`"
+          class="hover:text-primary"
+          >{{ title }}</NuxtLink
+        >
+        <template v-else>{{ title }}</template>
       </h2>
       <Button
         v-if="leagueId"

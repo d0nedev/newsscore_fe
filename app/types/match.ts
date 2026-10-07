@@ -114,6 +114,8 @@ export interface League {
   start?: string;
   end?: string;
   standings: StandingRow[];
+  /** Cup group tables; empty for leagues. */
+  groups?: { name: string; standings: StandingRow[] }[];
   /** Past seasons shown on the league archive tab. */
   archive: { season: string; winner: string; runnerUp: string }[];
 }

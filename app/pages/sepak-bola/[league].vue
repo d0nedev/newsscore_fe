@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Info, Pin, Trophy } from "@lucide/vue";
+import type { Match } from "~/types/match";
 import { slugify } from "~/utils/slug";
 import { seasonProgress } from "~/utils/standings";
 
@@ -8,8 +9,11 @@ const leagueQuery = useLeague(() => String(route.params.league));
 const league = computed(() => leagueQuery.data.value);
 useHead(() => ({ title: league.value?.name ?? "Kompetisi tidak ditemukan" }));
 
-// Cups have no table, so the standings tab disappears for them.
-const hasStandings = computed(() => (league.value?.standings.length ?? 0) > 0);
+// Cups have group tables instead; the standings tab disappears when neither exists.
+const groups = computed(() => league.value?.groups ?? []);
+const hasStandings = computed(
+  () => (league.value?.standings.length ?? 0) > 0 || groups.value.length > 0,
+);
 const tab = ref("Ringkasan");
 
 const crumbs = computed(() => [
@@ -26,8 +30,18 @@ const matchesQuery = useMatches(() => ({
   ...matchWindow(),
 }));
 const all = computed(() => matchesQuery.data.value ?? []);
+// Newest first: the API sorts by kick-off.
+const played = (list: Match[]) =>
+  list.filter((match) => match.status !== "scheduled").reverse();
+// Breaks and finished seasons leave the window without results; look further back.
+const earlierQuery = useEarlierMatches(
+  () => String(route.params.league),
+  () => matchesQuery.isSuccess.value && !played(all.value).length,
+);
 const results = computed(() =>
-  all.value.filter((match) => match.status !== "scheduled"),
+  played(all.value).length
+    ? played(all.value)
+    : played(earlierQuery.data.value ?? []),
 );
 const fixtures = computed(() =>
   all.value.filter((match) => match.status === "scheduled"),
