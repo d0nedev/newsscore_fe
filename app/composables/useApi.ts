@@ -430,14 +430,26 @@ export function useTeams(ids: MaybeRefOrGetter<string[]>) {
   });
 }
 
-/** Teams whose name matches q (GET /search); idle below two characters. */
-export function useTeamSearch(q: MaybeRefOrGetter<string>) {
+export interface SearchPlayer {
+  id: string;
+  name: string;
+  number?: number;
+  /** Team name. */
+  team?: string;
+  photo?: string;
+}
+
+/** Teams and players whose name matches q (GET /search); idle below two characters. */
+export function useSearch(q: MaybeRefOrGetter<string>) {
   return useQuery({
     queryKey: ["search", q],
     queryFn: () =>
-      get<{ teams: Team[] }>("/search", { q: toValue(q) }).then((r) =>
-        r.teams.map(withLogo),
-      ),
+      get<{ teams: Team[]; players: SearchPlayer[] }>("/search", {
+        q: toValue(q).trim(),
+      }).then((r) => ({
+        teams: r.teams.map(withLogo),
+        players: r.players.map((p) => ({ ...p, photo: assetUrl(p.photo) })),
+      })),
     enabled: () => toValue(q).trim().length >= 2,
     staleTime: 60_000,
   });

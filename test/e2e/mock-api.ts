@@ -193,6 +193,23 @@ async function handle(route: Route) {
     const data = team(id!);
     return data ? json(route, 200, { data }) : notFound(route);
   }
+  if (resource === "search") {
+    const term = (q.get("q") ?? "").toLowerCase();
+    const hit = (name: string) => name.toLowerCase().includes(term);
+    const data = {
+      teams: teams
+        .filter((t) => hit(t.name))
+        .slice(0, 5)
+        .map(({ id, name, badge }) => ({ id, name, badge })),
+      players: teams
+        .flatMap((t) => t.squad.map((p) => ({ ...p, team: t.name })))
+        .filter((p) => hit(p.name))
+        .slice(0, 10)
+        .map(({ id, name, number, team }) => ({ id, name, number, team })),
+      news: [],
+    };
+    return json(route, 200, { data });
+  }
   if (resource === "players") {
     const data = player(id!);
     return data ? json(route, 200, { data }) : notFound(route);

@@ -124,6 +124,17 @@ test("skip link is the first tab stop and jumps to the content", async ({
   await expect(page.locator("#konten")).toBeFocused();
 });
 
+test("header search finds a team and a player", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Cari tim atau pemain" }).click();
+  await page
+    .getByRole("searchbox", { name: "Cari tim atau pemain" })
+    .fill("pal");
+  await page.getByRole("link", { name: /C\. Palmer/ }).click();
+  await expect(page).toHaveURL(/\/pemain\//);
+  await expect(page.getByRole("dialog")).toBeHidden();
+});
+
 test("unknown match shows not found", async ({ page }) => {
   await page.goto("/pertandingan/nope");
   await expect(page.getByText("Pertandingan tidak ditemukan.")).toBeVisible();

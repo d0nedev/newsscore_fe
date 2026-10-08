@@ -16,9 +16,9 @@ const myTeams = useTeams(followed.ids);
 
 const adding = ref(false);
 const q = ref("");
-const search = useTeamSearch(refDebounced(q, 300));
+const search = useSearch(refDebounced(q, 300));
 const candidates = computed(() =>
-  (search.data.value ?? []).filter((t) => !followed.isFollowed(t.id)),
+  (search.data.value?.teams ?? []).filter((t) => !followed.isFollowed(t.id)),
 );
 const add = (id: string) => {
   followed.toggle(id);

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Menu, Search, Star, User, X } from "@lucide/vue";
+import { Menu, Star, User, X } from "@lucide/vue";
 import {
   DialogClose,
   DialogContent,
@@ -57,16 +57,8 @@ const showAdSlots = import.meta.dev;
         <NuxtLink to="/" class="text-2xl font-extrabold tracking-tight">
           NEWS<span class="bg-primary ml-1 rounded px-1.5">SCORE</span>
         </NuxtLink>
-        <!-- Search and sign-in have no backend yet: disabled, not fake-clickable. -->
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Pencarian (segera hadir)"
-          disabled
-          class="hover:bg-header-foreground/10 ml-auto rounded-full"
-        >
-          <Search />
-        </Button>
+        <SearchDialog />
+        <!-- Sign-in has no backend yet: disabled, not fake-clickable. -->
         <Button
           variant="ghost"
           disabled
