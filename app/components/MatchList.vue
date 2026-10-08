@@ -13,6 +13,7 @@ const props = defineProps<{
 }>();
 
 const open = ref(true);
+const { findLeague } = useCompetitions();
 // Competitions without an id (e.g. a team's fixtures) star by their title.
 const followed = useFollowed("competition");
 const followKey = computed(() => props.leagueId ?? props.title ?? "");
@@ -40,7 +41,11 @@ const pinned = computed(() => isPinned(props.leagueId));
       >
         <Star :fill="starred ? 'currentColor' : 'none'" />
       </Button>
-      <CountryChip v-if="subtitle" :country="subtitle" />
+      <LeagueMark
+        v-if="subtitle"
+        :country="subtitle"
+        :logo="findLeague(leagueId)?.logo"
+      />
       <h2 class="min-w-0 truncate font-bold">
         <span v-if="subtitle" class="uppercase">{{ subtitle }}:</span>
         <NuxtLink

@@ -12,7 +12,7 @@ defineProps<{ leagues: League[]; top?: number }>();
           :to="`/sepak-bola/${league.id}`"
           class="hover:text-primary mb-2 flex items-center gap-2 text-xs font-bold uppercase"
         >
-          <CountryChip :country="league.country" />
+          <LeagueMark :country="league.country" :logo="league.logo" />
           {{ league.name }}
         </NuxtLink>
         <table class="w-full text-sm">

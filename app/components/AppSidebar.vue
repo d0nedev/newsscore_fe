@@ -46,7 +46,7 @@ const add = (id: string) => {
             :to="`/sepak-bola/${league.id}`"
             class="hover:text-primary flex items-center gap-2 py-1.5"
           >
-            <CountryChip :country="league.country" />
+            <LeagueMark :country="league.country" :logo="league.logo" />
             {{ league.name }}
           </NuxtLink>
         </li>
@@ -72,7 +72,7 @@ const add = (id: string) => {
             class="hover:text-primary flex items-center gap-2 py-1.5"
             active-class="text-primary font-semibold"
           >
-            <CountryChip :country="league.country" />
+            <LeagueMark :country="league.country" :logo="league.logo" />
             {{ league.name }}
           </NuxtLink>
         </li>

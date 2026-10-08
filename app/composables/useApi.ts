@@ -73,6 +73,8 @@ interface ApiLeague {
   type: "league" | "cup";
   /** 0 until a match is stored. */
   season: number;
+  /** Local path under /assets/leagues/. */
+  logo?: string;
   /** Only on GET /leagues/{id}. */
   standings?: ApiStandingRow[];
   /** Cups only, on GET /leagues/{id}. */
@@ -192,6 +194,8 @@ const toLeague = (l: ApiLeague): League => ({
   country: l.country,
   type: l.type,
   season: l.season ? String(l.season) : "",
+  // The API mirrors every logo at this path; missing ones 404 and fall back to the country chip.
+  logo: assetUrl(l.logo || `/assets/leagues/${l.id}.png`),
   standings: (l.standings ?? []).map(withLogo),
   groups: (l.groups ?? []).map((g) => ({
     name: g.name,

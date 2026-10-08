@@ -108,6 +108,8 @@ export interface League {
   country: string;
   name: string;
   season: string;
+  /** Logo URL; absent when the source has none. */
+  logo?: string;
   /** Cups and friendlies have no table, so they never appear in standings UI. */
   type?: "league" | "cup" | "friendly";
   /** Season window as "DD.MM", used by the header progress bar. */

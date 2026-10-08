@@ -89,7 +89,12 @@ const pinned = computed(() => isPinned(league.value?.id));
   />
 
   <div v-else-if="league" class="space-y-4">
-    <PageHeader :crumbs="crumbs" :title="league.name" icon="trophy">
+    <PageHeader
+      :crumbs="crumbs"
+      :title="league.name"
+      icon="trophy"
+      :logo="league.logo"
+    >
       <template #actions>
         <Button
           variant="ghost"
