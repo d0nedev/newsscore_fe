@@ -31,9 +31,14 @@ export default defineNuxtConfig({
         },
         { property: "og:site_name", content: "NEWSSCORE" },
         { property: "og:type", content: "website" },
+        // Matches the header bar, so mobile browser chrome blends in.
+        { name: "theme-color", content: "#061b22" },
       ],
       // Weights match what templates use: 800 is the logo and the match-page score.
       link: [
+        { rel: "icon", href: "/favicon.ico", sizes: "32x32" },
+        { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+        { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
         {
           rel: "preconnect",

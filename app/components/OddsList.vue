@@ -14,7 +14,7 @@ const rows = computed(() =>
 
 <template>
   <p class="text-muted-foreground px-4 pb-3 text-xs">
-    Angka dummy untuk tampilan, bukan peluang sungguhan.
+    Peluang bersifat indikatif dan dapat berubah sewaktu-waktu.
   </p>
   <Table class="text-sm">
     <TableHeader>

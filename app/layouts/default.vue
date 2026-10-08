@@ -173,8 +173,8 @@ const showAdSlots = import.meta.dev;
             NEWS<span class="bg-primary ml-1 rounded px-1.5">SCORE</span>
           </p>
           <p class="text-header-foreground/60 mt-3 text-xs leading-relaxed">
-            Skor langsung, klasemen, dan statistik pertandingan. Seluruh angka
-            di situs ini masih data dummy untuk keperluan pengembangan.
+            Skor langsung, jadwal, klasemen, dan statistik sepak bola Indonesia
+            dan dunia.
           </p>
         </div>
 
@@ -214,8 +214,8 @@ const showAdSlots = import.meta.dev;
             Tentang Data
           </h2>
           <p class="text-header-foreground/60 mt-3 text-xs leading-relaxed">
-            Jadwal, hasil, dan klasemen diperbarui otomatis saat sumber data
-            tersambung. Sampai saat itu, semua isinya contoh statis.
+            Jadwal, hasil, dan klasemen diperbarui otomatis. Data dapat berbeda
+            dengan rilis resmi penyelenggara kompetisi.
           </p>
           <p class="text-header-foreground/60 mt-3 text-xs">
             Ada koreksi data?
@@ -228,8 +228,8 @@ const showAdSlots = import.meta.dev;
         <div
           class="text-header-foreground/50 mx-auto flex max-w-[1240px] flex-col gap-1 px-4 py-4 text-xs sm:flex-row sm:justify-between"
         >
-          <p>&copy; {{ year }} NEWSSCORE</p>
-          <p>Skor hanya untuk demonstrasi.</p>
+          <p>&copy; {{ year }} NEWSSCORE. Hak cipta dilindungi.</p>
+          <p>Seluruh merek dan logo klub milik pemiliknya masing-masing.</p>
         </div>
       </div>
     </footer>

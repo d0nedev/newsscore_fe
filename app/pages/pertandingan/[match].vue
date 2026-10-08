@@ -340,7 +340,7 @@ const headerCardId = useCardId("papan-skor");
 
     <SectionCard v-else-if="mainTab === 'Peluang'" title="Peluang 1X2">
       <p class="text-muted-foreground px-4 pb-2 text-xs">
-        Angka dummy untuk tampilan, bukan peluang sungguhan.
+        Peluang bersifat indikatif dan dapat berubah sewaktu-waktu.
       </p>
       <Table>
         <TableHeader>
