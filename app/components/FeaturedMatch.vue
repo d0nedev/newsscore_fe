@@ -6,7 +6,7 @@ const props = defineProps<{ match: Match; league?: string }>();
 
 const goals = (side: "home" | "away") =>
   props.match.events.filter(
-    (event) => event.type === "goal" && event.team === side,
+    (event) => event.type === "goal" && !event.shootout && event.team === side,
   );
 </script>
 

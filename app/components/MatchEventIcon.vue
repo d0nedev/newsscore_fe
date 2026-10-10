@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ArrowLeftRight, Goal } from "@lucide/vue";
+import { ArrowLeftRight, CircleX, Goal } from "@lucide/vue";
 import type { MatchEvent } from "~/types/match";
 
 defineProps<{ type: MatchEvent["type"] }>();
 
 const labels: Record<MatchEvent["type"], string> = {
   goal: "Gol",
+  missed: "Penalti gagal",
   sub: "Pergantian",
   yellow: "Kartu kuning",
   red: "Kartu merah",
@@ -18,6 +19,12 @@ const labels: Record<MatchEvent["type"], string> = {
     class="size-4 shrink-0"
     role="img"
     :aria-label="labels.goal"
+  />
+  <CircleX
+    v-else-if="type === 'missed'"
+    class="size-4 shrink-0 text-destructive"
+    role="img"
+    :aria-label="labels.missed"
   />
   <ArrowLeftRight
     v-else-if="type === 'sub'"

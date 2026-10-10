@@ -111,11 +111,14 @@ const followed = ref(false);
             >)
           </template>
         </p>
-        <MetaLine label="Usia">
+        <MetaLine v-if="age" label="Usia">
           <span class="font-score">{{ age }}</span>
           <template v-if="player?.birthDate">
             ({{ player.birthDate }})</template
           >
+        </MetaLine>
+        <MetaLine v-if="player?.height" label="Tinggi">
+          <span class="font-score">{{ player.height }} cm</span>
         </MetaLine>
         <MetaLine v-if="player?.marketValue" label="Nilai pasar">
           {{ player.marketValue }}

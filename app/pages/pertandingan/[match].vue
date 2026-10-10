@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Star, Tv } from "@lucide/vue";
+import { playerMarks } from "~/utils/lineup";
 import { slugify } from "~/utils/slug";
 
 const route = useRoute();
@@ -64,6 +65,13 @@ const starred = computed(() => ({
   home: !!match.value && followedTeams.isFollowed(match.value.home.id),
   away: !!match.value && followedTeams.isFollowed(match.value.away.id),
 }));
+
+const marks = computed(() => playerMarks(match.value?.events ?? []));
+
+// SofaScore sends ratings only for some competitions; drop an all-empty column.
+const hasRatings = computed(
+  () => match.value?.playerStats?.some((row) => row.rating) ?? false,
+);
 
 const headerCardId = useCardId("papan-skor");
 </script>
@@ -219,6 +227,7 @@ const headerCardId = useCardId("papan-skor");
             : 'Susunan pemain belum diumumkan.'
         "
       >
+        <FormationPitch :match="match" :marks="marks" />
         <div class="grid sm:grid-cols-2 sm:divide-x">
           <div
             v-for="side in ['home', 'away'] as const"
@@ -229,25 +238,21 @@ const headerCardId = useCardId("papan-skor");
               class="text-muted-foreground mb-2 text-xs font-semibold uppercase"
             >
               {{ side === "home" ? match.home.name : match.away.name }}
-            </h3>
-            <ul class="space-y-1 text-sm">
-              <li
-                v-for="player in match.lineups[side]"
-                :key="player.number"
-                class="flex gap-2"
+              <span
+                v-if="match.formations?.[side]"
+                class="text-foreground ml-1 font-score"
+                >{{ match.formations[side] }}</span
               >
-                <span class="text-muted-foreground w-6 text-right font-score">{{
-                  player.number
-                }}</span>
-                <NuxtLink
-                  v-if="player.playerId"
-                  :to="`/pemain/${player.playerId}`"
-                  class="hover:underline"
-                  >{{ player.name }}</NuxtLink
-                >
-                <span v-else>{{ player.name }}</span>
-              </li>
-            </ul>
+            </h3>
+            <LineupList :players="match.lineups[side]" :marks="marks" />
+            <template v-if="match.substitutes?.[side].length">
+              <h4
+                class="text-muted-foreground mt-4 mb-2 text-xs font-semibold uppercase"
+              >
+                Cadangan
+              </h4>
+              <LineupList :players="match.substitutes[side]" :marks="marks" />
+            </template>
           </div>
         </div>
       </SectionCard>
@@ -262,7 +267,7 @@ const headerCardId = useCardId("papan-skor");
             <TableRow>
               <TableHead>Pemain</TableHead>
               <TableHead>Tim</TableHead>
-              <TableHead class="text-right">Nilai</TableHead>
+              <TableHead v-if="hasRatings" class="text-right">Nilai</TableHead>
               <TableHead class="text-right">Gol</TableHead>
               <TableHead class="text-right">Assist</TableHead>
               <TableHead class="text-right">Tembakan</TableHead>
@@ -282,7 +287,7 @@ const headerCardId = useCardId("papan-skor");
               <TableCell class="text-muted-foreground">
                 {{ row.team === "home" ? match.home.name : match.away.name }}
               </TableCell>
-              <TableCell class="text-right">
+              <TableCell v-if="hasRatings" class="text-right">
                 <RatingBadge :rating="row.rating" />
               </TableCell>
               <TableCell class="text-right font-score">{{

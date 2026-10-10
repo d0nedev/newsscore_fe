@@ -1,4 +1,4 @@
-import { useQueries, useQuery } from "@tanstack/vue-query";
+import { useInfiniteQuery, useQueries, useQuery } from "@tanstack/vue-query";
 import type { MaybeRefOrGetter } from "vue";
 import { apiFetch } from "~/services/api-client";
 import type { ApiResponse } from "~/types/api";
@@ -15,6 +15,7 @@ import type {
   Team,
   TeamProfile,
 } from "~/types/match";
+import { roundLabel } from "~/utils/rounds";
 import { slugify } from "~/utils/slug";
 
 // Query hooks for every Go API read (openapi: newsscore 1.0.0). Each hook maps
@@ -49,6 +50,11 @@ interface ApiLineupPlayer {
   name: string;
   number?: number;
   starter: boolean;
+  photo?: string;
+  /** Starters only: 1 goalkeeper, then each line from defence to attack. */
+  formationPlace?: number;
+  /** SofaScore matches only; keys vary by competition. */
+  stats?: Record<string, number>;
 }
 
 interface ApiMatchDetail extends ApiMatch {
@@ -60,7 +66,12 @@ interface ApiMatchDetail extends ApiMatch {
     assist?: string;
     note?: string;
   }[];
-  lineups: { home?: ApiLineupPlayer[]; away?: ApiLineupPlayer[] };
+  lineups: {
+    home?: ApiLineupPlayer[];
+    away?: ApiLineupPlayer[];
+    homeFormation?: string;
+    awayFormation?: string;
+  };
   stats: { label: string; home: string; away: string }[];
 }
 
@@ -105,6 +116,9 @@ interface ApiPlayerProfile {
   number?: number;
   position?: string;
   country?: string;
+  /** "YYYY-MM-DD". */
+  birthDate?: string;
+  heightCm?: number;
   team: Team | null;
   season: {
     season?: number;
@@ -143,7 +157,7 @@ const toMatch = ({ league: _league, ...m }: ApiMatch): Match => ({
   ...m,
   home: withLogo(m.home),
   away: withLogo(m.away),
-  round: m.round ?? "",
+  round: roundLabel(m.round),
   venue: "",
   events: [],
   stats: [],
@@ -155,20 +169,34 @@ const toLineup = (p: ApiLineupPlayer) => ({
   number: p.number ?? 0,
   name: p.name,
   playerId: p.playerId,
+  photo: assetUrl(p.photo),
+  formationPlace: p.formationPlace,
+  rating: p.stats?.rating,
 });
 
-const EVENT_TYPES = new Set(["goal", "yellow", "red", "sub"]);
+// Source type -> row type; anything else (period markers, raw types) has no row design.
+const EVENT_TYPES: Record<string, MatchEvent["type"]> = {
+  goal: "goal",
+  "penalty missed": "missed",
+  yellow: "yellow",
+  red: "red",
+  sub: "sub",
+};
+
+const side = (players: ApiLineupPlayer[] | undefined, starter: boolean) =>
+  (players ?? []).filter((p) => p.starter === starter).map(toLineup);
 
 const toMatchDetail = (m: ApiMatchDetail): Match => ({
   ...toMatch(m),
-  // Period markers and raw source types have no row design; skip them.
   events: m.events
-    .filter((e) => e.team && EVENT_TYPES.has(e.type))
+    .filter((e) => e.team && EVENT_TYPES[e.type])
     .map((e) => ({
       minute: Number.parseInt(e.minute, 10) || 0,
       minuteLabel: e.minute,
       team: e.team as "home" | "away",
-      type: e.type as MatchEvent["type"],
+      type: EVENT_TYPES[e.type]!,
+      // Shootout kicks carry their round ("3") instead of a minute ("3'").
+      shootout: !e.minute.includes("'"),
       player: e.player,
       assist: e.assist,
       note: e.note,
@@ -180,12 +208,41 @@ const toMatchDetail = (m: ApiMatchDetail): Match => ({
       label: s.label,
       home: Number.parseFloat(s.home) || 0,
       away: Number.parseFloat(s.away) || 0,
-      percent: s.home.endsWith("%") || s.away.endsWith("%"),
+      percent: s.home.includes("%") || s.away.includes("%"),
+      // Passes come as "83% (601/722)": keep the counts too.
+      text: /\(/.test(s.home + s.away)
+        ? { home: s.home, away: s.away }
+        : undefined,
     })),
   lineups: {
-    home: (m.lineups.home ?? []).filter((p) => p.starter).map(toLineup),
-    away: (m.lineups.away ?? []).filter((p) => p.starter).map(toLineup),
+    home: side(m.lineups.home, true),
+    away: side(m.lineups.away, true),
   },
+  substitutes: {
+    home: side(m.lineups.home, false),
+    away: side(m.lineups.away, false),
+  },
+  formations: {
+    home: m.lineups.homeFormation,
+    away: m.lineups.awayFormation,
+  },
+  playerStats: (["home", "away"] as const).flatMap((team) =>
+    (m.lineups[team] ?? []).flatMap((p) =>
+      p.stats
+        ? [
+            {
+              team,
+              name: p.name,
+              playerId: p.playerId,
+              rating: p.stats.rating,
+              goals: p.stats.goals ?? 0,
+              assists: p.stats.goalAssist ?? p.stats.assists ?? 0,
+              shots: p.stats.totalShots ?? 0,
+            },
+          ]
+        : [],
+    ),
+  ),
 });
 
 const toLeague = (l: ApiLeague): League => ({
@@ -233,6 +290,16 @@ const toTeam = (t: ApiTeamProfile): TeamProfile => ({
   matches: [...t.recentMatches, ...t.upcomingMatches].map(toMatch),
 });
 
+/** Whole years from a "YYYY-MM-DD" birth date to today. */
+const ageOn = (birthDate: string) => {
+  const born = new Date(birthDate);
+  const now = new Date();
+  const hadBirthday =
+    now.getMonth() > born.getMonth() ||
+    (now.getMonth() === born.getMonth() && now.getDate() >= born.getDate());
+  return now.getFullYear() - born.getFullYear() - (hadBirthday ? 0 : 1);
+};
+
 const toPlayer = (p: ApiPlayerProfile): PlayerProfile => ({
   id: p.id,
   name: p.name,
@@ -241,6 +308,9 @@ const toPlayer = (p: ApiPlayerProfile): PlayerProfile => ({
   number: p.number,
   position: isPosition(p.position) ? POSITIONS[p.position] : p.position,
   country: p.country,
+  birthDate: p.birthDate?.split("-").reverse().join("."),
+  age: p.birthDate ? ageOn(p.birthDate) : undefined,
+  height: p.heightCm,
   goalkeeper: p.position === "GK",
   season: {
     matches: p.season.matches ?? 0,
@@ -353,6 +423,41 @@ export function useLeagueTables() {
   });
 }
 
+export interface TopPlayer {
+  rank: number;
+  playerId: string;
+  name: string;
+  photo?: string;
+  teamId?: string;
+  team?: string;
+  badge?: string;
+  logo?: string;
+  /** Goals, cards, or a rating like 7.12. */
+  value: number;
+  appearances?: number;
+}
+
+/** Season leaderboards by category (GET /leagues/{id}/top-players); SofaScore competitions only. */
+export function useTopPlayers(id: MaybeRefOrGetter<string>) {
+  return useQuery({
+    queryKey: ["top-players", id],
+    queryFn: () =>
+      get<{ categories: { category: string; players: TopPlayer[] }[] }>(
+        `/leagues/${toValue(id)}/top-players`,
+      ).then((d) =>
+        d.categories.map((c) => ({
+          category: c.category,
+          players: c.players.map((p) => ({
+            ...p,
+            photo: assetUrl(p.photo),
+            logo: assetUrl(p.logo),
+          })),
+        })),
+      ),
+    staleTime: 5 * 60_000,
+  });
+}
+
 export interface MatchFilter {
   date?: string;
   /** "DD.MM.YYYY" range, at most 31 days; replaces date. */
@@ -379,28 +484,61 @@ export function useMatches(
   });
 }
 
-/** Matches of the latest 31-day stretch before matchWindow() that has any, up to a year back. */
-export function useEarlierMatches(
-  leagueId: MaybeRefOrGetter<string>,
-  enabled: MaybeRefOrGetter<boolean> = true,
-) {
-  return useQuery({
-    queryKey: ["earlier-matches", leagueId],
-    queryFn: async () => {
-      const start = Date.now() - 16 * DAY;
-      // ponytail: up to 12 sequential requests for a dormant competition; a "last match date" on /leagues/{id} would make it one.
-      for (let k = 0; k < 12; k++) {
-        const to = start - k * 31 * DAY;
+/**
+ * A competition's fixtures from today to the end of the season, 31 days per
+ * page (the widest range /matches accepts). The last page is the first empty one.
+ */
+export function useSeasonFixtures(leagueId: MaybeRefOrGetter<string>) {
+  return useInfiniteQuery({
+    queryKey: ["season-fixtures", leagueId],
+    initialPageParam: 0,
+    queryFn: ({ pageParam }) => {
+      const from = Date.now() + pageParam * 31 * DAY;
+      return get<ApiMatch[]>("/matches", {
+        leagueId: toValue(leagueId),
+        status: "scheduled",
+        from: formatDate(from),
+        to: formatDate(from + 30 * DAY),
+      }).then((list) => list.map(toMatch));
+    },
+    // ponytail: stops at the first empty month; a break longer than 31 days ends the list early.
+    getNextPageParam: (last, _all, page) =>
+      last.length ? page + 1 : undefined,
+    staleTime: 5 * 60_000,
+  });
+}
+
+/**
+ * A competition's played matches, newest first, 31 days per page going back
+ * from today. The first page skips empty months (a finished cup) up to a year;
+ * later pages stop at the first empty month, the gap before the season began.
+ */
+export function useSeasonResults(leagueId: MaybeRefOrGetter<string>) {
+  return useInfiniteQuery({
+    queryKey: ["season-results", leagueId],
+    initialPageParam: 0,
+    queryFn: async ({ pageParam }) => {
+      // ponytail: up to 12 sequential requests on the first page, and a mid-season break over 31 days ends the list; a season on /matches would fix both.
+      const tries = pageParam === 0 ? 12 : 1;
+      for (let k = pageParam; k < pageParam + tries; k++) {
+        const to = Date.now() - k * 31 * DAY;
         const list = await get<ApiMatch[]>("/matches", {
           leagueId: toValue(leagueId),
           from: formatDate(to - 30 * DAY),
           to: formatDate(to),
         });
-        if (list.length) return list.map(toMatch);
+        const played = list.filter((m) => m.status !== "scheduled");
+        if (played.length) {
+          return { matches: played.map(toMatch).reverse(), next: k + 1 };
+        }
       }
-      return [];
+      return { matches: [] as Match[], next: undefined };
     },
-    enabled,
+    getNextPageParam: (last) => last.next,
+    refetchInterval: (query) =>
+      query.state.data?.pages[0]?.matches.some((m) => m.status === "live")
+        ? 30_000
+        : false,
     staleTime: 5 * 60_000,
   });
 }

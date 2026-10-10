@@ -135,6 +135,14 @@ test("header search finds a team and a player", async ({ page }) => {
   await expect(page.getByRole("dialog")).toBeHidden();
 });
 
+test("league top players tab lists scorers", async ({ page }) => {
+  await page.goto("/sepak-bola/liga-primer");
+  await page.getByRole("tab", { name: "Pemain Terbaik" }).click();
+  await expect(page.getByRole("heading", { name: "Top skor" })).toBeVisible();
+  await page.locator("ol li a").first().click();
+  await expect(page).toHaveURL(/\/pemain\//);
+});
+
 test("unknown match shows not found", async ({ page }) => {
   await page.goto("/pertandingan/nope");
   await expect(page.getByText("Pertandingan tidak ditemukan.")).toBeVisible();

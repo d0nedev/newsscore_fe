@@ -150,8 +150,29 @@ async function handle(route: Route) {
   const url = new URL(route.request().url());
   const path = url.pathname.replace(/^\/api\/v1/, "");
   const q = url.searchParams;
-  const [, resource, id] = path.split("/");
+  const [, resource, id, sub] = path.split("/");
 
+  if (resource === "leagues" && sub === "top-players") {
+    const scorers = teams
+      .flatMap((t) => t.squad.map((p) => ({ p, t })))
+      .filter(({ p }) => p.goals > 0)
+      .sort((a, b) => b.p.goals - a.p.goals)
+      .map(({ p, t }, i) => ({
+        rank: i + 1,
+        playerId: p.id,
+        name: p.name,
+        teamId: t.id,
+        team: t.name,
+        badge: t.badge,
+        value: p.goals,
+      }));
+    const data = {
+      leagueId: id,
+      season: 2026,
+      categories: [{ category: "goals", players: scorers }],
+    };
+    return json(route, 200, { data });
+  }
   if (resource === "leagues") {
     if (!id) {
       const data = competitions.map((l) => toApiLeague(l, false));

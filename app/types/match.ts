@@ -14,8 +14,10 @@ export interface MatchEvent {
   /** As the source wrote it, e.g. "45+2'". */
   minuteLabel?: string;
   team: "home" | "away";
-  type: "goal" | "yellow" | "red" | "sub";
+  type: "goal" | "missed" | "yellow" | "red" | "sub";
   player: string;
+  /** A penalty shootout kick; minute is then the kick's round. */
+  shootout?: boolean;
   note?: string;
   /** Goal assist, or the player replaced on a substitution. */
   assist?: string;
@@ -27,12 +29,18 @@ export interface MatchStat {
   away: number;
   /** Rendered as "12%" instead of "12" when true. */
   percent?: boolean;
+  /** Source text when it says more than the number, e.g. "83% (601/722)". */
+  text?: { home: string; away: string };
 }
 
 export interface LineupPlayer {
   number: number;
   name: string;
   playerId?: string;
+  photo?: string;
+  /** Starter's slot in the formation: 1 is the goalkeeper, then line by line. */
+  formationPlace?: number;
+  rating?: number;
 }
 
 export interface MatchOdds {
@@ -52,7 +60,8 @@ export interface PlayerMatchStat {
   team: "home" | "away";
   name: string;
   playerId?: string;
-  rating: number;
+  /** Absent when the source has no rating. */
+  rating?: number;
   goals: number;
   assists: number;
   shots: number;
@@ -74,6 +83,10 @@ export interface Match {
   events: MatchEvent[];
   stats: MatchStat[];
   lineups: { home: LineupPlayer[]; away: LineupPlayer[] };
+  /** Bench players; absent for matches without a squad list. */
+  substitutes?: { home: LineupPlayer[]; away: LineupPlayer[] };
+  /** e.g. "4-4-2"; absent when the source gives none. */
+  formations?: { home?: string; away?: string };
   headToHead: { date: string; label: string; score: string }[];
   /** Detail tabs only exist for matches with a full dummy record. */
   odds?: MatchOdds[];

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Info, Pin, Trophy } from "@lucide/vue";
-import type { Match } from "~/types/match";
+import { groupByRound } from "~/utils/rounds";
 import { slugify } from "~/utils/slug";
 import { seasonProgress } from "~/utils/standings";
 
@@ -30,24 +30,34 @@ const matchesQuery = useMatches(() => ({
   ...matchWindow(),
 }));
 const all = computed(() => matchesQuery.data.value ?? []);
-// Newest first: the API sorts by kick-off.
-const played = (list: Match[]) =>
-  list.filter((match) => match.status !== "scheduled").reverse();
-// Breaks and finished seasons leave the window without results; look further back.
-const earlierQuery = useEarlierMatches(
-  () => String(route.params.league),
-  () => matchesQuery.isSuccess.value && !played(all.value).length,
+// Results reach back through the season, a month per click; the summary previews them.
+const seasonResults = useSeasonResults(() => String(route.params.league));
+const results = computed(
+  () => seasonResults.data.value?.pages.flatMap((page) => page.matches) ?? [],
 );
-const results = computed(() =>
-  played(all.value).length
-    ? played(all.value)
-    : played(earlierQuery.data.value ?? []),
+// The fixtures tab runs to the end of the season, a month per click, by round.
+const seasonFixtures = useSeasonFixtures(() => String(route.params.league));
+const fixtureRounds = computed(() =>
+  groupByRound(seasonFixtures.data.value?.pages.flat() ?? []),
 );
+// Newest week first, like the results themselves.
+// Group in play order, then flip: latest week (or the final) on top.
+const resultRounds = computed(() =>
+  groupByRound(results.value.toReversed())
+    .reverse()
+    .map((g) => ({ ...g, matches: g.matches.toReversed() })),
+);
+
 const fixtures = computed(() =>
   all.value.filter((match) => match.status === "scheduled"),
 );
 const withOdds = computed(() =>
   all.value.filter((match) => match.odds?.length),
+);
+
+const topPlayersQuery = useTopPlayers(() => String(route.params.league));
+const topPlayers = computed(() =>
+  (topPlayersQuery.data.value ?? []).filter((c) => c.players.length),
 );
 
 const tabs = computed(() => [
@@ -56,6 +66,7 @@ const tabs = computed(() => [
   "Hasil Pertandingan",
   "Jadwal Pertandingan",
   ...(hasStandings.value ? ["Klasemen"] : []),
+  ...(topPlayers.value.length ? ["Pemain Terbaik"] : []),
   ...(league.value?.archive.length ? ["Arsip"] : []),
 ]);
 // The summary tab previews each list; the dedicated tabs show everything.
@@ -183,31 +194,60 @@ const pinned = computed(() => isPinned(league.value?.id));
     <SectionCard
       v-else-if="tab === 'Hasil Pertandingan'"
       title="Hasil"
-      :empty="results.length ? undefined : 'Belum ada hasil.'"
+      :empty="
+        seasonResults.isPending.value || results.length
+          ? undefined
+          : 'Belum ada hasil.'
+      "
+      :more-label="
+        seasonResults.hasNextPage.value && !seasonResults.isFetching.value
+          ? 'Muat hasil sebelumnya'
+          : undefined
+      "
+      @more="seasonResults.fetchNextPage()"
     >
-      <MatchList
-        :title="league.name"
-        :subtitle="league.country"
-        :matches="results"
-      />
+      <SkeletonRows v-if="seasonResults.isPending.value" :rows="6" />
+      <section v-for="group in resultRounds" :key="group.round">
+        <SubHeading>{{ group.round }}</SubHeading>
+        <MatchList :matches="group.matches" />
+      </section>
     </SectionCard>
 
     <SectionCard
       v-else-if="tab === 'Jadwal Pertandingan'"
       title="Jadwal"
-      :empty="fixtures.length ? undefined : 'Belum ada jadwal.'"
+      :empty="
+        seasonFixtures.isPending.value || fixtureRounds.length
+          ? undefined
+          : 'Belum ada jadwal.'
+      "
+      :more-label="
+        seasonFixtures.hasNextPage.value && !seasonFixtures.isFetching.value
+          ? 'Muat jadwal berikutnya'
+          : undefined
+      "
+      @more="seasonFixtures.fetchNextPage()"
     >
-      <MatchList
-        :title="league.name"
-        :subtitle="league.country"
-        :matches="fixtures"
-      />
+      <SkeletonRows v-if="seasonFixtures.isPending.value" :rows="6" />
+      <section v-for="group in fixtureRounds" :key="group.round">
+        <SubHeading>{{ group.round }}</SubHeading>
+        <MatchList :matches="group.matches" />
+      </section>
     </SectionCard>
 
     <StandingsBlock
       v-else-if="tab === 'Klasemen' && hasStandings"
       :league="league"
     />
+
+    <template v-else-if="tab === 'Pemain Terbaik'">
+      <TopPlayersCard
+        v-for="c in topPlayers"
+        :key="c.category"
+        :category="c.category"
+        :players="c.players"
+      />
+    </template>
 
     <SectionCard
       v-else-if="tab === 'Peluang'"
