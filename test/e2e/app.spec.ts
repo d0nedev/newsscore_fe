@@ -91,10 +91,9 @@ test("mobile menu opens the sidebar and closes on navigation", async ({
   await page.goto("/");
   await page.getByRole("button", { name: "Menu" }).click();
   const drawer = page.getByRole("dialog", { name: "Menu" });
-  await drawer
-    .getByRole("navigation", { name: "Kompetisi" })
-    .getByRole("link", { name: "Liga Primer" })
-    .click();
+  const competitions = drawer.getByRole("navigation", { name: "Kompetisi" });
+  await competitions.getByText("Inggris", { exact: true }).click();
+  await competitions.getByRole("link", { name: "Liga Primer" }).click();
   await expect(page).toHaveURL("/sepak-bola/liga-primer");
   await expect(drawer).toHaveCount(0);
 });

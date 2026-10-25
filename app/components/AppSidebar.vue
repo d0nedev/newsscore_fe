@@ -1,14 +1,21 @@
 <script setup lang="ts">
 import { refDebounced } from "@vueuse/core";
-import { Pin, Plus, Star, X } from "@lucide/vue";
+import { ChevronDown, Pin, Plus, Star, X } from "@lucide/vue";
 import { slugify } from "~/utils/slug";
 
 const { pinnedLeagues } = usePinnedLeagues();
-const { competitions, countries } = useCompetitions();
+const { countries, byCountry, findLeague, findCountry } = useCompetitions();
+
+// The group holding the page you're on starts open.
+const route = useRoute();
+const currentCountry = computed(
+  () =>
+    findLeague(route.params.league as string)?.country ??
+    findCountry(route.params.country as string),
+);
 
 // Long lists start short; one click shows the rest, another folds them back.
 const FIRST = 3;
-const allCompetitions = ref(false);
 const allCountries = ref(false);
 
 const followed = useFollowed("team");
@@ -59,59 +66,43 @@ const add = (id: string) => {
       >
         Kompetisi
       </h2>
-      <ul class="py-1 text-sm">
-        <li
-          v-for="league in competitions.slice(
-            0,
-            allCompetitions ? undefined : FIRST,
-          )"
-          :key="league.id"
-        >
-          <NuxtLink
-            :to="`/sepak-bola/${league.id}`"
-            class="hover:text-primary flex items-center gap-2 py-1.5"
-            active-class="text-primary font-semibold"
-          >
-            <LeagueMark :country="league.country" :logo="league.logo" />
-            {{ league.name }}
-          </NuxtLink>
-        </li>
-      </ul>
-      <Button
-        v-if="competitions.length > FIRST"
-        variant="link"
-        class="h-auto px-0 py-1.5 text-sm font-semibold"
-        :aria-expanded="allCompetitions"
-        @click="allCompetitions = !allCompetitions"
+      <details
+        v-for="country in countries.slice(0, allCountries ? undefined : FIRST)"
+        :key="country"
+        :open="country === currentCountry"
+        class="group"
       >
-        {{ allCompetitions ? "Muat lebih sedikit" : "Muat lebih banyak" }}
-      </Button>
-    </nav>
-
-    <nav aria-label="Negara">
-      <h2
-        class="flex items-center gap-2 border-b pb-2 text-xs font-bold uppercase"
-      >
-        Negara
-      </h2>
-      <ul class="py-1 text-sm">
-        <li
-          v-for="country in countries.slice(
-            0,
-            allCountries ? undefined : FIRST,
-          )"
-          :key="country"
+        <summary
+          class="hover:text-primary flex cursor-pointer list-none items-center gap-2 py-1.5 text-sm [&::-webkit-details-marker]:hidden"
         >
-          <NuxtLink
-            :to="`/negara/${slugify(country)}`"
-            class="hover:text-primary flex items-center gap-2 py-1.5"
-            active-class="text-primary font-semibold"
-          >
-            <CountryChip :country="country" />
-            {{ country }}
-          </NuxtLink>
-        </li>
-      </ul>
+          <CountryChip :country="country" />
+          <span class="flex-1">{{ country }}</span>
+          <ChevronDown
+            class="text-muted-foreground size-4 transition-transform group-open:rotate-180"
+          />
+        </summary>
+        <ul class="border-l pb-1 pl-3 text-sm">
+          <li v-for="league in byCountry(country)" :key="league.id">
+            <NuxtLink
+              :to="`/sepak-bola/${league.id}`"
+              class="hover:text-primary flex items-center gap-2 py-1.5"
+              active-class="text-primary font-semibold"
+            >
+              <LeagueMark :country="league.country" :logo="league.logo" />
+              {{ league.name }}
+            </NuxtLink>
+          </li>
+          <li>
+            <NuxtLink
+              :to="`/negara/${slugify(country)}`"
+              class="text-muted-foreground hover:text-primary block py-1.5 text-xs"
+              active-class="text-primary font-semibold"
+            >
+              Semua di {{ country }}
+            </NuxtLink>
+          </li>
+        </ul>
+      </details>
       <Button
         v-if="countries.length > FIRST"
         variant="link"
