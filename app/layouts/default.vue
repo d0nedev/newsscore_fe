@@ -52,7 +52,7 @@ const showAdSlots = import.meta.dev;
       class="bg-background text-foreground sr-only z-50 rounded px-3 py-2 text-sm font-semibold focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
       >Lewati ke konten</a
     >
-    <header class="bg-header text-header-foreground">
+    <header class="bg-batik text-header-foreground">
       <div class="mx-auto flex max-w-[1240px] items-center gap-2 px-4 py-5">
         <NuxtLink to="/" class="text-2xl font-extrabold tracking-tight">
           NEWS<span class="bg-primary ml-1 rounded px-1.5">SCORE</span>
