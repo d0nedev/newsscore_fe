@@ -42,7 +42,6 @@ const help = [
   "Kontak",
 ];
 const year = new Date().getFullYear();
-const showAdSlots = import.meta.dev;
 </script>
 
 <template>
@@ -139,21 +138,6 @@ const showAdSlots = import.meta.dev;
         <slot />
       </main>
 
-      <!-- Ad rail: placeholders show in dev only, until a real ad script is wired in. -->
-      <aside
-        v-if="showAdSlots"
-        aria-label="Iklan"
-        class="hidden w-[300px] shrink-0 space-y-4 xl:block"
-      >
-        <div
-          v-for="slot in ['iklan-atas', 'iklan-bawah']"
-          :key="slot"
-          :data-ad-slot="slot"
-          class="text-muted-foreground bg-background grid h-64 place-items-center border border-dashed text-xs"
-        >
-          Ruang iklan 300&times;250
-        </div>
-      </aside>
     </div>
 
     <footer class="bg-header text-header-foreground mt-4">
