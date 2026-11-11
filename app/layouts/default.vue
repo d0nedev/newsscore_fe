@@ -138,6 +138,17 @@ const year = new Date().getFullYear();
         <slot />
       </main>
 
+      <!-- Ad rail: empty slots keep the 3-column layout until a real ad script fills them. -->
+      <aside
+        aria-label="Iklan"
+        class="hidden w-[300px] shrink-0 space-y-4 xl:block"
+      >
+        <div
+          v-for="slot in ['iklan-atas', 'iklan-bawah']"
+          :key="slot"
+          :data-ad-slot="slot"
+        />
+      </aside>
     </div>
 
     <footer class="bg-header text-header-foreground mt-4">
