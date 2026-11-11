@@ -138,7 +138,7 @@ const year = new Date().getFullYear();
         <slot />
       </main>
 
-      <!-- Ad rail: empty slots keep the 3-column layout until a real ad script fills them. -->
+      <!-- Ad rail: placeholders until a real ad script is wired in. -->
       <aside
         aria-label="Iklan"
         class="hidden w-[300px] shrink-0 space-y-4 xl:block"
@@ -147,7 +147,10 @@ const year = new Date().getFullYear();
           v-for="slot in ['iklan-atas', 'iklan-bawah']"
           :key="slot"
           :data-ad-slot="slot"
-        />
+          class="text-muted-foreground bg-background grid h-64 place-items-center border border-dashed text-xs"
+        >
+          Ruang iklan 300&times;250
+        </div>
       </aside>
     </div>
 
