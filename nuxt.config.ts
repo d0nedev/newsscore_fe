@@ -50,6 +50,14 @@ export default defineNuxtConfig({
           href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700&family=Barlow+Condensed:wght@500;600;700;800&display=swap",
         },
       ],
+      script: [
+        {
+          src: "https://analytics.newsscore.id/script.js",
+          defer: true,
+          "data-website-id": "d801e23c-a358-4aea-b00f-40a436a66069",
+          "data-domains": "newsscore.id, www.newsscore.id",
+        },
+      ],
     },
   },
 
